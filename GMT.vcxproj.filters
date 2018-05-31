@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="View.cpp" />
+    <ClCompile Include="MainView.cpp" />
+    <ClCompile Include="Font.cpp" />
+    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="Object.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="View.h" />
+    <ClInclude Include="MainView.h" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="Window.h" />
+    <ClInclude Include="Object.h" />
+  </ItemGroup>
+</Project>
