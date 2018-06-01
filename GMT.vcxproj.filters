@@ -6,6 +6,7 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Grid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -13,5 +14,6 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Grid.h" />
   </ItemGroup>
 </Project>

@@ -90,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="MainView.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="View.cpp" />
@@ -97,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Font.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="MainView.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="View.h" />

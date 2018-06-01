@@ -3,9 +3,19 @@
 
 #include "SFML/Graphics.hpp"
 
+#include <functional>
+
 using namespace GMT;
 
-MainView::MainView()
+namespace
+{
+	const int LogWidth = 1920;
+	const int LogHeight = 1080;
+	const int GridSize = 50;
+	//const int GridSize = int(LogHeight / (530 / 25.4f));
+}
+
+MainView::MainView() : m_grid(LogWidth, LogHeight, GridSize)
 {
 	m_object = std::make_unique<Object>();
 }
@@ -15,11 +25,37 @@ MainView::~MainView() = default;
 void MainView::Draw(sf::RenderWindow& window) const
 {
 	m_object->Draw(window);
+
+	const sf::FloatRect rect = GetLogRect();
+	
+	sf::VertexArray border(sf::LinesStrip, 3);
+	border[0].position = { LogWidth - 1, 0 };
+	border[1].position = { LogWidth - 1, LogHeight - 1 };
+	border[2].position = { 0, LogHeight - 1 };
+
+	for (int i = 0; i < 3; ++i)
+		border[i].color = sf::Color::White;
+
+	sf::VertexArray gridLines(sf::Lines);
+	for (int x = 0; x <= m_grid.GetCellCountX(); ++x)
+	{
+		gridLines.append(sf::Vertex(m_grid.GetPoint({ x, 0 }), sf::Color::Red));
+		gridLines.append(sf::Vertex(m_grid.GetPoint({ x, m_grid.GetCellCountY() }), sf::Color::Red));
+	}
+
+	for (int y = 0; y <= m_grid.GetCellCountY(); ++y)
+	{
+		gridLines.append(sf::Vertex(m_grid.GetPoint({ 0, y }), sf::Color::Red));
+		gridLines.append(sf::Vertex(m_grid.GetPoint({ m_grid.GetCellCountX(), y }), sf::Color::Red));
+	}
+
+	window.draw(border);
+	window.draw(gridLines);
 }
 
 sf::FloatRect MainView::GetLogRect() const
 {
-	return sf::FloatRect(0, 0, 1920, 1080);
+	return sf::FloatRect(0, 0, (float)LogWidth, (float)LogHeight);
 }
 
 sf::FloatRect MainView::GetClipRect() const

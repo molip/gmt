@@ -1,6 +1,7 @@
 #pragma once
 
 #include "View.h"
+#include "Grid.h"
 
 #include <memory>
 
@@ -21,6 +22,7 @@ namespace GMT
 		virtual sf::FloatRect GetClipRect() const override;
 
 		std::unique_ptr<Object> m_object;
+		Grid m_grid;
 	};
 }
 
