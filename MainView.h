@@ -7,7 +7,10 @@
 
 namespace GMT
 {
-	class Object;
+	namespace Model
+	{
+		class Object;
+	}
 
 	class MainView : public View
 	{
@@ -21,8 +24,8 @@ namespace GMT
 		virtual sf::FloatRect GetLogRect() const override;
 		virtual sf::FloatRect GetClipRect() const override;
 
-		std::unique_ptr<Object> m_object;
 		Grid m_grid;
+		std::unique_ptr<Model::Object> m_object;
 	};
 }
 

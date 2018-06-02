@@ -1,5 +1,4 @@
 #include "View.h"
-#include "Object.h"
 
 #include "SFML/Graphics.hpp"
 

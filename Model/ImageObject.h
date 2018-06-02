@@ -1,28 +1,27 @@
 #pragma once
 
+#include "Object.h"
+
 #include <memory>
 
 namespace sf
 {
 	class Texture;
-	class Image;
 	class Sprite;
-	class RenderWindow;
 }
 
-namespace GMT
+namespace GMT::Model
 {
-	class Object
+	class ImageObject : public Object
 	{
 	public:
-		Object();
-		virtual ~Object();
+		ImageObject();
+		virtual ~ImageObject();
 
-		void Draw(sf::RenderWindow& window) const;
+		virtual void Draw(RenderContext& rc) const override;
 
 	private:
 		std::unique_ptr<sf::Texture> m_texture;
-		std::unique_ptr<sf::Image> m_image;
 		std::unique_ptr<sf::Sprite> m_sprite;
 	};
 }

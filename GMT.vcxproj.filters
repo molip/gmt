@@ -5,15 +5,38 @@
     <ClCompile Include="MainView.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Window.cpp" />
-    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="Model\Object.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\ImageObject.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
     <ClInclude Include="MainView.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="Window.h" />
-    <ClInclude Include="Object.h" />
     <ClInclude Include="Grid.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Model">
+      <UniqueIdentifier>{2efc80d7-d494-49be-9b83-46826a517d7b}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="RenderContext.h" />
+    <ClInclude Include="Model\Object.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\ImageObject.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Model">
+      <UniqueIdentifier>{2efc80d7-d494-49be-9b83-46826a517d7b}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="RenderContext.h" />
   </ItemGroup>
 </Project>
