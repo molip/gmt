@@ -4,6 +4,7 @@
 #include "Grid.h"
 
 #include <memory>
+#include <vector>
 
 namespace GMT
 {
@@ -25,7 +26,7 @@ namespace GMT
 		virtual sf::FloatRect GetClipRect() const override;
 
 		Grid m_grid;
-		std::unique_ptr<Model::Object> m_object;
+		std::vector<std::unique_ptr<Model::Object>> m_objects;
 	};
 }
 

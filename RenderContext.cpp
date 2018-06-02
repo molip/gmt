@@ -2,7 +2,7 @@
 
 using namespace GMT;
 
-RenderContext::RenderContext(sf::RenderWindow& window) : m_window(window)
+RenderContext::RenderContext(sf::RenderWindow& window, const Grid& grid) : m_window(window), m_grid(grid)
 {
 }
 

@@ -96,6 +96,7 @@
     <ClCompile Include="MainView.cpp" />
     <ClCompile Include="Model\ImageObject.cpp" />
     <ClCompile Include="Model\Object.cpp" />
+    <ClCompile Include="Model\VectorObject.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="View.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="MainView.h" />
     <ClInclude Include="Model\ImageObject.h" />
     <ClInclude Include="Model\Object.h" />
+    <ClInclude Include="Model\VectorObject.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="View.h" />
     <ClInclude Include="Window.h" />

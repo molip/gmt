@@ -1,5 +1,6 @@
 #include "MainView.h"
 #include "Model/ImageObject.h"
+#include "Model/VectorObject.h"
 
 #include "SFML/Graphics.hpp"
 
@@ -17,15 +18,18 @@ namespace
 
 MainView::MainView() : m_grid(LogWidth, LogHeight, GridSize)
 {
-	m_object = std::make_unique<Model::ImageObject>();
+	m_objects.push_back(std::make_unique<Model::ImageObject>());
+	m_objects.push_back(std::make_unique<Model::VectorObject>());
 }
 
 MainView::~MainView() = default;
 
 void MainView::Draw(sf::RenderWindow& window) const
 {
-	RenderContext rc(window);
-	m_object->Draw(rc);
+	RenderContext rc(window, m_grid);
+	
+	for (auto& object : m_objects)
+		object->Draw(rc);
 
 	const sf::FloatRect rect = GetLogRect();
 	

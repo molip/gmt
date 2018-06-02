@@ -13,6 +13,9 @@
       <Filter>Model</Filter>
     </ClCompile>
     <ClCompile Include="RenderContext.cpp" />
+    <ClCompile Include="Model\VectorObject.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -20,6 +23,9 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="Model\VectorObject.h">
+      <Filter>Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Model">
