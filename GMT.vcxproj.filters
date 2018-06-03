@@ -16,6 +16,9 @@
     <ClCompile Include="Model\VectorObject.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="Tools\VectorTool.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
     <ClCompile Include="Tools\Tool.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
@@ -28,6 +31,9 @@
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Model\VectorObject.h">
       <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\VectorTool.h">
+      <Filter>Tools</Filter>
     </ClInclude>
     <ClInclude Include="Tools\Tool.h">
       <Filter>Tools</Filter>

@@ -12,7 +12,9 @@ namespace GMT
 		int GetCellCountX() const { return m_cellsX; }
 		int GetCellCountY() const { return m_cellsY; }
 
+		// Logical points.
 		sf::Vector2f GetPoint(sf::Vector2i gridPoint) const;
+		sf::Vector2i GetNearestGridPoint(sf::Vector2f point, float* distanceSquared) const;
 
 	private:
 		const int m_widthPixels;

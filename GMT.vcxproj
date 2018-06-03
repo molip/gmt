@@ -99,6 +99,7 @@
     <ClCompile Include="Model\VectorObject.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="Tools\Tool.cpp" />
+    <ClCompile Include="Tools\VectorTool.cpp" />
     <ClCompile Include="View.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -111,6 +112,7 @@
     <ClInclude Include="Model\VectorObject.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="Tools\Tool.h" />
+    <ClInclude Include="Tools\VectorTool.h" />
     <ClInclude Include="View.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

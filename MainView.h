@@ -16,6 +16,7 @@ namespace GMT
 	namespace Tools
 	{
 		class Tool;
+		class VectorTool;
 	}
 
 	class MainView : public View
@@ -26,6 +27,9 @@ namespace GMT
 
 		virtual void Draw(sf::RenderWindow& window) const override;
 
+		float GetDevToLogScale() const;
+		const Grid& GetGrid() const { return m_grid; }
+
 	private:
 		virtual sf::FloatRect GetLogRect() const override;
 		virtual sf::FloatRect GetClipRect() const override;
@@ -34,7 +38,7 @@ namespace GMT
 
 		Grid m_grid;
 		std::vector<std::unique_ptr<Model::Object>> m_objects;
-		std::unique_ptr<Tools::Tool> m_tool;
+		std::unique_ptr<Tools::VectorTool> m_tool;
 	};
 }
 

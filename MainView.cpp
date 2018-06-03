@@ -2,7 +2,7 @@
 #include "Model/ImageObject.h"
 #include "Model/VectorObject.h"
 
-#include "Tools/Tool.h"
+#include "Tools/VectorTool.h"
 
 #include "SFML/Graphics.hpp"
 
@@ -20,6 +20,8 @@ MainView::MainView() : m_grid(LogWidth, LogHeight, GridSize)
 {
 	m_objects.push_back(std::make_unique<Model::ImageObject>());
 	m_objects.push_back(std::make_unique<Model::VectorObject>());
+
+	m_tool = std::make_unique<Tools::VectorTool>(*this);
 }
 
 MainView::~MainView() = default;
@@ -58,6 +60,11 @@ void MainView::Draw(sf::RenderWindow& window) const
 	window.draw(gridLines);
 
 	m_tool->Draw(rc);
+}
+
+float MainView::GetDevToLogScale() const
+{
+	return m_rect.width / (float)LogWidth;
 }
 
 sf::FloatRect MainView::GetLogRect() const

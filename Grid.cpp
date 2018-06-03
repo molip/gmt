@@ -18,3 +18,19 @@ sf::Vector2f Grid::GetPoint(sf::Vector2i gridPoint) const
 	return { float(m_borderX + gridPoint.x * m_cellSize), float(m_borderY + gridPoint.y * m_cellSize) };
 }
 
+sf::Vector2i Grid::GetNearestGridPoint(sf::Vector2f point, float* distanceSquared) const
+{
+	sf::Vector2f point2(point.x - (float)m_borderX, point.y - (float)m_borderY);
+	sf::Vector2i gridPoint(int(0.5 + point2.x / m_cellSize), int(0.5 + point2.y / m_cellSize));
+	gridPoint.x = std::min(std::max(0, gridPoint.x), m_cellsX);
+	gridPoint.y = std::min(std::max(0, gridPoint.y), m_cellsY);
+
+	if (distanceSquared)
+	{
+		sf::Vector2f delta = point - GetPoint(gridPoint);
+		*distanceSquared = delta.x * delta.x + delta.y + delta.y;
+	}
+
+	return gridPoint;
+}
+

@@ -8,7 +8,6 @@ using namespace GMT::Model;
 
 VectorObject::VectorObject()
 {
-	m_points = { { 1, 5 }, { 5, 1 }, { 9, 5 }, { 5, 9 } };
 }
 
 VectorObject::~VectorObject() = default;
@@ -25,8 +24,10 @@ void VectorObject::Draw(RenderContext& rc) const
 	for (auto& point : m_points)
 		addPoint(point);
 
-	if (!m_points.empty())
-		addPoint(m_points.front());
-
 	rc.GetWindow().draw(lines);
+}
+
+bool VectorObject::IsClosed() const
+{
+	return m_points.size() > 1 && m_points.back() == m_points.front();
 }

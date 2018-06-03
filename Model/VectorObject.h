@@ -16,6 +16,9 @@ namespace GMT::Model
 
 		virtual void Draw(RenderContext& rc) const override;
 
+		bool IsClosed() const;
+		std::vector<sf::Vector2i>& GetPoints() { return m_points; }
+
 	private:
 		std::vector<sf::Vector2i> m_points;
 	};
