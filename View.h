@@ -23,13 +23,19 @@ namespace GMT
 		const sf::IntRect& GetRect() const { return m_rect; }
 
 		void SetOrigin(const sf::Vector2i& origin);
+		void SetParent(View* parent) { m_parent = parent; }
 
 		void BaseDraw(sf::RenderWindow& window) const;
 		sf::View GetSFView(sf::RenderWindow& window) const;
 
 		View* HitTest(const sf::Vector2i& parentPoint);
 
-		virtual void OnMouseMoved(const sf::Vector2f position) {}
+		virtual void OnMouseMoved(const sf::Vector2i& point) {}
+		virtual void OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point) {}
+		virtual void OnMouseUp(sf::Mouse::Button button, const sf::Vector2i& point) {}
+
+		sf::Vector2i WorldToLocal(const sf::Vector2i& point) const;
+		sf::Vector2f DevToLog(const sf::Vector2i& point) const;
 
 	protected:
 		virtual sf::FloatRect GetLogRect() const;
@@ -40,5 +46,6 @@ namespace GMT
 		sf::IntRect m_rect; // Parent space.
 		sf::Vector2i m_origin; // World space.
 		std::vector<std::unique_ptr<View>> m_children;
+		View* m_parent;
 	};
 }

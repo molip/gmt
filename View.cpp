@@ -4,7 +4,7 @@
 
 using namespace GMT;
 
-View::View()
+View::View() : m_parent{}
 {
 }
 
@@ -73,4 +73,20 @@ View* View::HitTest(const sf::Vector2i& parentPoint)
 			return subView;
 
 	return this;
+}
+
+sf::Vector2i View::WorldToLocal(const sf::Vector2i& point) const
+{
+	return { point.x - m_origin.x, point.y - m_origin.y };
+}
+
+sf::Vector2f View::DevToLog(const sf::Vector2i& point) const
+{
+	sf::FloatRect logRect = GetLogRect();
+	sf::FloatRect clipRect = GetClipRect();
+
+	float normX = float(point.x - clipRect.left) / float(clipRect.width);
+	float normY = float(point.y - clipRect.top) / float(clipRect.height);
+
+	return { logRect.left + normX * logRect.width, logRect.top + normY * logRect.height };
 }

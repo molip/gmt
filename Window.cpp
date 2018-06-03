@@ -36,9 +36,52 @@ void Window::Draw()
 	display();
 }
 
-void Window::OnMouseMoved(const sf::Event::MouseMoveEvent& event)
+View* Window::HitTest(const sf::Vector2i& point)
 {
 	for (auto& view : m_views)
-		if (View* hit = view->HitTest({ event.x, event.y }))
-			std::cout << hit << std::endl;
+		if (View* hit = view->HitTest(point))
+			return hit;
+
+	return nullptr;
+}
+
+void Window::PumpEvents()
+{
+	sf::Event event;
+	while (pollEvent(event))
+	{
+		switch (event.type)
+		{
+		case sf::Event::MouseMoved:
+			OnMouseMoved(event.mouseMove);
+			break;
+		case sf::Event::MouseButtonPressed:
+			OnMouseDown(event.mouseButton);
+			break;
+		case sf::Event::MouseButtonReleased:
+			OnMouseUp(event.mouseButton);
+			break;
+		}
+	}
+}
+
+void Window::OnMouseMoved(const sf::Event::MouseMoveEvent& event)
+{
+	sf::Vector2i point { event.x, event.y };
+	if (View* hit = HitTest(point))
+		hit->OnMouseMoved(hit->WorldToLocal(point));
+}
+
+void Window::OnMouseDown(const sf::Event::MouseButtonEvent& event)
+{
+	sf::Vector2i point{ event.x, event.y };
+	if (View* hit = HitTest(point))
+		hit->OnMouseDown(event.button, hit->WorldToLocal(point));
+}
+
+void Window::OnMouseUp(const sf::Event::MouseButtonEvent& event)
+{
+	sf::Vector2i point{ event.x, event.y };
+	if (View* hit = HitTest(point))
+		hit->OnMouseUp(event.button, hit->WorldToLocal(point));
 }

@@ -19,10 +19,16 @@ namespace GMT
 
 		void Draw();
 
-		void OnMouseMoved(const sf::Event::MouseMoveEvent& event);
+		void PumpEvents();
 
 	protected:
 		void Init();
+
+		void OnMouseMoved(const sf::Event::MouseMoveEvent& event);
+		void OnMouseDown(const sf::Event::MouseButtonEvent& event);
+		void OnMouseUp(const sf::Event::MouseButtonEvent& event);
+
+		View* HitTest(const sf::Vector2i& point);
 
 		std::unique_ptr<View> m_mainView;
 		std::vector<View*> m_views;
