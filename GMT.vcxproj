@@ -83,14 +83,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="libraries\lib\Jig\Jig.vcxproj">
-      <Project>{6c7150c0-a88c-49ed-8b19-398e2764e4cb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="libraries\lib\SFML.vcxproj">
-      <Project>{efaa95a4-b8db-4ddc-be7b-ee76faa57513}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="MainView.cpp" />
@@ -115,6 +107,17 @@
     <ClInclude Include="Tools\VectorTool.h" />
     <ClInclude Include="View.h" />
     <ClInclude Include="Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="libraries\libKernel\libKernel.vcxproj">
+      <Project>{a75566a2-3ed4-428b-b903-cb57defbc4bc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="libraries\lib\Jig\Jig.vcxproj">
+      <Project>{6c7150c0-a88c-49ed-8b19-398e2764e4cb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="libraries\lib\SFML.vcxproj">
+      <Project>{efaa95a4-b8db-4ddc-be7b-ee76faa57513}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -69,7 +69,7 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 		if (m_object->IsClosed())
 		{
 			auto object = std::move(m_object);
-			if (object->GetPoints().size() > 2)
+			if (object->Tesselate())
 				m_objects.push_back(std::move(object));
 		}
 		else
