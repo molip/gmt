@@ -2,9 +2,9 @@
 #include "Model/ImageObject.h"
 #include "Model/VectorObject.h"
 
-#include "SFML/Graphics.hpp"
+#include "Tools/Tool.h"
 
-#include <functional>
+#include "SFML/Graphics.hpp"
 
 using namespace GMT;
 
@@ -56,6 +56,8 @@ void MainView::Draw(sf::RenderWindow& window) const
 
 	window.draw(border);
 	window.draw(gridLines);
+
+	m_tool->Draw(rc);
 }
 
 sf::FloatRect MainView::GetLogRect() const
@@ -82,4 +84,14 @@ sf::FloatRect MainView::GetClipRect() const
 		clipRect.height = clipRect.width / logAspect;
 
 	return clipRect;
+}
+
+void MainView::OnMouseMoved(const sf::Vector2i& point)
+{
+	m_tool->OnMouseMoved(point);
+}
+
+void MainView::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point)
+{
+	m_tool->OnMouseDown(button, point);
 }
