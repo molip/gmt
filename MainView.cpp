@@ -46,14 +46,14 @@ void MainView::Draw(sf::RenderWindow& window) const
 	sf::VertexArray gridLines(sf::Lines);
 	for (int x = 0; x <= m_grid.GetCellCountX(); ++x)
 	{
-		gridLines.append(sf::Vertex(m_grid.GetPoint({ x, 0 }), sf::Color::Red));
-		gridLines.append(sf::Vertex(m_grid.GetPoint({ x, m_grid.GetCellCountY() }), sf::Color::Red));
+		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(x, 0)), sf::Color::Yellow));
+		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(x, m_grid.GetCellCountY())), sf::Color::Yellow));
 	}
 
 	for (int y = 0; y <= m_grid.GetCellCountY(); ++y)
 	{
-		gridLines.append(sf::Vertex(m_grid.GetPoint({ 0, y }), sf::Color::Red));
-		gridLines.append(sf::Vertex(m_grid.GetPoint({ m_grid.GetCellCountX(), y }), sf::Color::Red));
+		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(0, y)), sf::Color::Yellow));
+		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(m_grid.GetCellCountX(), y)), sf::Color::Yellow));
 	}
 
 	window.draw(border);

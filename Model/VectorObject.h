@@ -2,8 +2,11 @@
 
 #include "Object.h"
 
+#include "Jig/VectorFwd.h"
+
 #include <SFML/System.hpp>
 
+#include <optional>
 #include <vector>
 
 namespace GMT::Model
@@ -22,6 +25,10 @@ namespace GMT::Model
 		bool Tesselate();
 
 	private:
+		using WallPoints = std::optional<std::pair<Jig::Vec2f, Jig::Vec2f>>;
+
+		WallPoints GetWallPointsLog(int index) const;
+		
 		std::vector<sf::Vector2i> m_points;
 		std::unique_ptr<std::vector<sf::Vector2i>> m_tesselated;
 	};

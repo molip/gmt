@@ -15,6 +15,11 @@ Grid::Grid(int widthPixels, int heightPixels, int cellSize) :
 
 sf::Vector2f Grid::GetPoint(sf::Vector2i gridPoint) const
 {
+	return GetPoint(sf::Vector2f(gridPoint));
+}
+
+sf::Vector2f Grid::GetPoint(sf::Vector2f gridPoint) const
+{
 	return { float(m_borderX + gridPoint.x * m_cellSize), float(m_borderY + gridPoint.y * m_cellSize) };
 }
 
