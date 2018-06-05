@@ -21,81 +21,52 @@ VectorObject::VectorObject()
 
 VectorObject::~VectorObject() = default;
 
-VectorObject::WallPoints VectorObject::GetWallPointsLog(int index) const
-{
-	if (m_points.empty())
-		return {};
-
-	const Jig::Vec2f prev(m_points[(index + m_points.size() - 1) % m_points.size()]);
-	const Jig::Vec2f point(m_points[index % m_points.size()]);
-	const Jig::Vec2f next(m_points[(index + 1) % m_points.size()]);
-
-	const auto* pPrev = (m_tesselated || index > 0) ? &prev : nullptr;
-	const auto* pNext = (m_tesselated || index < m_points.size() - 1) ? &next : nullptr;
-
-	return Jig::GetMitrePoints(point, pPrev, pNext, ::WallThickness, Jig::LineAlignment::Outer);
-}
-
 void VectorObject::Draw(RenderContext& rc) const
 {
-	auto addPoint = [&](auto& verts, auto& point)
+	auto addPoint = [&](auto& verts, auto& point, auto colour)
 	{
-		verts.append(sf::Vertex(rc.GetGrid().GetPoint(point), sf::Color::Green));
+		verts.append(sf::Vertex(rc.GetGrid().GetPoint(point), colour));
 	};
 
-	sf::VertexArray verts;
-	if (m_tesselated)
+	if (m_floor)
 	{
-		verts.setPrimitiveType(sf::Triangles);
-		for (auto& point : *m_tesselated)
-			addPoint(verts, point);
+		sf::VertexArray floor(sf::Triangles), walls(sf::Triangles);
+
+		for (auto& point : *m_floor)
+			addPoint(floor, point, sf::Color::Green);
+
+		if (m_walls)
+			for (auto& point : *m_walls)
+				addPoint(walls, point, sf::Color::Red);
+
+		rc.GetWindow().draw(floor);
+		rc.GetWindow().draw(walls);
 	}
 	else
 	{
-		verts.setPrimitiveType(sf::LinesStrip);
+		sf::VertexArray verts(sf::LinesStrip);
+
 		for (auto& point : m_points)
-			addPoint(verts, point);
+			addPoint(verts, point, sf::Color::Green);
+
+		rc.GetWindow().draw(verts);
 	}
-
-	rc.GetWindow().draw(verts);
-
-	sf::VertexArray normals(sf::Lines);
-	sf::VertexArray wall1(sf::LinesStrip);
-	sf::VertexArray wall2(sf::LinesStrip);
-
-	auto addWallPoints = [&](int index)
-	{
-		auto wallPoints = GetWallPointsLog(index);
-		if (!wallPoints.has_value())
-			return false;
-
-		const sf::Vector2f dev1 = rc.GetGrid().GetPoint(wallPoints.value().first);
-		const sf::Vector2f dev2 = rc.GetGrid().GetPoint(wallPoints.value().second);
-
-		normals.append(sf::Vertex(dev1, sf::Color::Red));
-		normals.append(sf::Vertex(dev2, sf::Color::Red));
-
-		wall1.append(sf::Vertex(dev1, sf::Color::Red));
-		wall2.append(sf::Vertex(dev2, sf::Color::Red));
-		return true;
-	};
-
-	for (int i = 0; i < (int)m_points.size(); ++i)
-		if (!addWallPoints(i))
-			break;
-
-	if (m_tesselated)
-		addWallPoints(0);
-
-	rc.GetWindow().draw(normals);
-	rc.GetWindow().draw(wall1);
-	rc.GetWindow().draw(wall2);
-
 }
 
 bool VectorObject::IsClosed() const
 {
 	return m_points.size() > 1 && m_points.back() == m_points.front();
+}
+
+VectorObject::MeshPtr VectorObject::MakeMesh(const Jig::EdgeMesh& edgeMesh) const
+{
+	MeshPtr mesh = std::make_unique<Mesh>();
+	mesh->reserve(edgeMesh.GetFaces().size() * 3);
+	for (auto& face : edgeMesh.GetFaces())
+		for (auto& point : face->GetPointLoop())
+			mesh->push_back({ (float)point.x, (float)point.y });
+
+	return mesh;
 }
 
 bool VectorObject::Tesselate()
@@ -121,14 +92,42 @@ bool VectorObject::Tesselate()
 	if (poly.IsSelfIntersecting())
 		return false;
 
-	Jig::EdgeMesh mesh = Jig::Triangulator(poly).Go();
-
-	m_tesselated = std::make_unique<std::vector<sf::Vector2i>>();
-	m_tesselated->reserve(mesh.GetFaces().size() * 3);
-
-	for (auto& face : mesh.GetFaces())
-		for (auto& point : face->GetPointLoop())
-			m_tesselated->push_back({ (int)point.x, (int)point.y });
+	m_floor = MakeMesh(Jig::Triangulator(poly).Go());
+	m_walls = TesselateWall(poly);
 
 	return true;
+}
+
+VectorObject::MeshPtr VectorObject::TesselateWall(const Jig::Polygon& poly) const
+{
+	Jig::Polygon inner, outer;
+
+	auto addWallPoints = [&](int index)	
+	{
+		const Jig::Vec2f prev = poly.GetVertex(index - 1);
+		const Jig::Vec2f point = poly.GetVertex(index);
+		const Jig::Vec2f next = poly.GetVertex(index + 1);
+
+		auto wallPoints = Jig::GetMitrePoints(point, &prev, &next, ::WallThickness, Jig::LineAlignment::Outer);
+		if (!wallPoints.has_value())
+			return false;
+
+		inner.push_back(wallPoints.value().first);
+		outer.push_back(wallPoints.value().second);
+		return true;
+	};
+
+	for (size_t i = 0; i < poly.size(); ++i)
+		if (!addWallPoints(int(i)))
+			break;
+
+	inner.Update();
+	outer.Update();
+	if (inner.IsSelfIntersecting() || outer.IsSelfIntersecting())
+		return nullptr;
+
+	Jig::Triangulator triangulator(outer);
+	triangulator.AddHole(inner);
+
+	return MakeMesh(triangulator.Go());
 }
