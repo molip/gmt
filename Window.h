@@ -20,6 +20,7 @@ namespace GMT
 		void Draw();
 
 		void PumpEvents();
+		void PumpEvent(const sf::Event& event);
 
 	protected:
 		void Init();

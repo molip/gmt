@@ -27,6 +27,8 @@ void Window::Init()
 
 void Window::Draw()
 {
+	clear();
+	
 	for (auto& view : m_views)
 	{
 		view->SetOrigin({});
@@ -49,19 +51,22 @@ void Window::PumpEvents()
 {
 	sf::Event event;
 	while (pollEvent(event))
+		PumpEvent(event);
+}
+
+void Window::PumpEvent(const sf::Event& event)
+{
+	switch (event.type)
 	{
-		switch (event.type)
-		{
-		case sf::Event::MouseMoved:
-			OnMouseMoved(event.mouseMove);
-			break;
-		case sf::Event::MouseButtonPressed:
-			OnMouseDown(event.mouseButton);
-			break;
-		case sf::Event::MouseButtonReleased:
-			OnMouseUp(event.mouseButton);
-			break;
-		}
+	case sf::Event::MouseMoved:
+		OnMouseMoved(event.mouseMove);
+		break;
+	case sf::Event::MouseButtonPressed:
+		OnMouseDown(event.mouseButton);
+		break;
+	case sf::Event::MouseButtonReleased:
+		OnMouseUp(event.mouseButton);
+		break;
 	}
 }
 
