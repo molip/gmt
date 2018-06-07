@@ -22,6 +22,10 @@
     <ClCompile Include="Tools\Tool.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
+    <ClCompile Include="Model\Model.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -38,6 +42,10 @@
     <ClInclude Include="Tools\Tool.h">
       <Filter>Tools</Filter>
     </ClInclude>
+    <ClInclude Include="Model\Model.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Model">

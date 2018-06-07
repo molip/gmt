@@ -83,10 +83,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="App.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="MainView.cpp" />
     <ClCompile Include="Model\ImageObject.cpp" />
+    <ClCompile Include="Model\Model.cpp" />
     <ClCompile Include="Model\Object.cpp" />
     <ClCompile Include="Model\VectorObject.cpp" />
     <ClCompile Include="RenderContext.cpp" />
@@ -96,10 +98,12 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="MainView.h" />
     <ClInclude Include="Model\ImageObject.h" />
+    <ClInclude Include="Model\Model.h" />
     <ClInclude Include="Model\Object.h" />
     <ClInclude Include="Model\VectorObject.h" />
     <ClInclude Include="RenderContext.h" />

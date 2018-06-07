@@ -1,8 +1,10 @@
 #include "VectorTool.h"
 
+#include "../App.h"
 #include "../MainView.h"
 #include "../RenderContext.h"
 
+#include "../Model/Model.h"
 #include "../Model/VectorObject.h"
 
 #include <SFML/Graphics.hpp>
@@ -30,9 +32,6 @@ void VectorTool::Draw(RenderContext& rc) const
 		circle.setPosition(m_view.GetGrid().GetPoint(gridPoint) - sf::Vector2f(radius, radius));
 		rc.GetWindow().draw(circle);
 	};
-
-	for (auto& object : m_objects)
-		object->Draw(rc);
 
 	if (m_object)
 		m_object->Draw(rc);
@@ -70,7 +69,7 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 		{
 			auto object = std::move(m_object);
 			if (object->Tesselate())
-				m_objects.push_back(std::move(object));
+				App::GetModel().AddObject(std::move(object));
 		}
 		else
 			m_object->GetPoints().push_back(m_gridPoint);

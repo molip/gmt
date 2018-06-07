@@ -1,6 +1,9 @@
 #include "MainView.h"
+#include "App.h"
+
 #include "Model/ImageObject.h"
 #include "Model/VectorObject.h"
+#include "Model/Model.h"
 
 #include "Tools/VectorTool.h"
 
@@ -18,9 +21,6 @@ namespace
 
 MainView::MainView() : m_grid(LogWidth, LogHeight, GridSize)
 {
-	m_objects.push_back(std::make_unique<Model::ImageObject>());
-	m_objects.push_back(std::make_unique<Model::VectorObject>());
-
 	m_tool = std::make_unique<Tools::VectorTool>(*this);
 }
 
@@ -57,6 +57,9 @@ void MainView::Draw(sf::RenderWindow& window) const
 	}
 
 	window.draw(border);
+
+	App::GetModel().Draw(rc);
+
 	window.draw(gridLines);
 
 	m_tool->Draw(rc);

@@ -28,6 +28,5 @@ namespace GMT::Tools
 		sf::Vector2i m_gridPoint;
 		bool m_snapped = false;
 		std::unique_ptr<Model::VectorObject> m_object;
-		std::vector<std::unique_ptr<Model::VectorObject>> m_objects;
 	};
 }
