@@ -23,19 +23,24 @@ sf::Vector2f Grid::GetPoint(sf::Vector2f gridPoint) const
 	return { float(m_borderX + gridPoint.x * m_cellSize), float(m_borderY + gridPoint.y * m_cellSize) };
 }
 
+sf::Vector2f Grid::GetGridPoint(sf::Vector2f point) const
+{
+	return { float((point.x - m_borderX) / m_cellSize), float((point.y - m_borderY) / m_cellSize) };
+}
+
 sf::Vector2i Grid::GetNearestGridPoint(sf::Vector2f point, float* distanceSquared) const
 {
-	sf::Vector2f point2(point.x - (float)m_borderX, point.y - (float)m_borderY);
-	sf::Vector2i gridPoint(int(0.5 + point2.x / m_cellSize), int(0.5 + point2.y / m_cellSize));
-	gridPoint.x = std::min(std::max(0, gridPoint.x), m_cellsX);
-	gridPoint.y = std::min(std::max(0, gridPoint.y), m_cellsY);
+	sf::Vector2f gridPoint = GetGridPoint(point);
+	sf::Vector2i intGridPoint;
+	intGridPoint.x = std::min(std::max(0, int(0.5 + gridPoint.x)), m_cellsX);
+	intGridPoint.y = std::min(std::max(0, int(0.5 + gridPoint.y)), m_cellsY);
 
 	if (distanceSquared)
 	{
-		sf::Vector2f delta = point - GetPoint(gridPoint);
-		*distanceSquared = delta.x * delta.x + delta.y + delta.y;
+		sf::Vector2f delta = gridPoint - sf::Vector2f(intGridPoint);
+		*distanceSquared = delta.x * delta.x + delta.y * delta.y;
 	}
 
-	return gridPoint;
+	return intGridPoint;
 }
 

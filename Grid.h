@@ -15,6 +15,7 @@ namespace GMT
 		// Logical points.
 		sf::Vector2f GetPoint(sf::Vector2i gridPoint) const;
 		sf::Vector2f GetPoint(sf::Vector2f gridPoint) const;
+		sf::Vector2f GetGridPoint(sf::Vector2f point) const;
 		sf::Vector2i GetNearestGridPoint(sf::Vector2f point, float* distanceSquared) const;
 
 	private:

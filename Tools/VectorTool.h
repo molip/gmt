@@ -2,6 +2,8 @@
 
 #include "Tool.h"
 
+#include "Jig/EdgeMesh.h"
+
 namespace GMT
 {
 	class MainView;
@@ -24,9 +26,32 @@ namespace GMT::Tools
 		virtual void OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point) override;
 
 	private:
+		enum class Snap { None, Grid, Object };
+
+		struct OverState
+		{
+			const Model::VectorObject* object{};
+			const Jig::EdgeMesh::Face* room{};
+			Jig::EdgeMesh::VertPtr vertex{};
+			sf::Vector2f gridPoint; // Model coords.
+			Snap snap = Snap::None;
+		};
+
+		struct ObjectEdit
+		{
+			const Model::VectorObject* object{};
+			const Jig::EdgeMesh::Face* room{};
+			Jig::EdgeMesh::VertPtr start{}, end{};
+		};
+
+		bool IsClosed() const;
+		void Update(const sf::Vector2f& logPoint);
+		OverState HitTest(const sf::Vector2f& logPoint, const Model::VectorObject* special) const;
+
 		const MainView& m_view;
-		sf::Vector2i m_gridPoint;
-		bool m_snapped = false;
-		std::unique_ptr<Model::VectorObject> m_object;
+		std::vector<sf::Vector2f> m_points;
+		OverState m_overState;
+		
+		std::unique_ptr<ObjectEdit> m_objectEdit;
 	};
 }

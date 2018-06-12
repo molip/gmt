@@ -2,6 +2,7 @@
 
 #include "Object.h"
 
+#include "Jig/EdgeMesh.h"
 #include "Jig/VectorFwd.h"
 
 #include <SFML/System.hpp>
@@ -11,7 +12,6 @@
 
 namespace Jig
 {
-	class EdgeMesh;
 	class Polygon;
 }
 
@@ -20,25 +20,31 @@ namespace GMT::Model
 	class VectorObject : public Object
 	{
 	public:
-		VectorObject();
+		VectorObject(const std::vector<sf::Vector2f>& points);
 		virtual ~VectorObject();
 
 		virtual void Draw(RenderContext& rc) const override;
 
-		bool IsClosed() const;
-		std::vector<sf::Vector2i>& GetPoints() { return m_points; }
-
-		bool Tesselate();
+		struct HitTestResult
+		{
+			const Jig::EdgeMesh::Vert* vert = {};
+			float distanceSquared = 0;
+		};
+		
+		HitTestResult HitTest(const sf::Vector2f& point, float tolerance) const;
+		const Jig::EdgeMesh::Face* HitTestRooms(const sf::Vector2f& point) const;
 
 	private:
 		using WallPoints = std::optional<std::pair<Jig::Vec2f, Jig::Vec2f>>;
-		using Mesh = std::vector<sf::Vector2f>;
-		using MeshPtr = std::unique_ptr<Mesh>;
+		using TriangleMesh = std::vector<sf::Vector2f>;
+		using TriangleMeshPtr = std::unique_ptr<TriangleMesh>;
 
-		MeshPtr TesselateWall(const Jig::Polygon& poly) const;
-		VectorObject::MeshPtr MakeMesh(const Jig::EdgeMesh& edgeMesh) const;
+		bool Tesselate(std::vector<sf::Vector2f> points);
+		TriangleMeshPtr TesselateWall(const Jig::Polygon& poly) const;
+		TriangleMeshPtr MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const;
 
-		std::vector<sf::Vector2i> m_points;
-		MeshPtr m_floor, m_walls;
+		TriangleMeshPtr m_floor, m_walls;
+
+		std::unique_ptr<Jig::EdgeMesh> m_edgeMesh;
 	};
 }

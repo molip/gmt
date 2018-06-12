@@ -33,51 +33,142 @@ void VectorTool::Draw(RenderContext& rc) const
 		rc.GetWindow().draw(circle);
 	};
 
-	if (m_object)
-		m_object->Draw(rc);
+	sf::VertexArray verts(sf::LinesStrip);
 
-	if (m_object)
-		for (auto& point : m_object->GetPoints())
+	for (auto& point : m_points)
+	{
+		verts.append(sf::Vertex(rc.GetGrid().GetPoint(point), sf::Color::Green));
 		drawCircle(point, SmallDotRadius, sf::Color::Green);
+	}
 
-	if (m_snapped)
-		drawCircle(m_gridPoint, BigDotRadius, m_object && m_object->IsClosed() ? sf::Color::Green : sf::Color::Red);
+	if (!m_points.empty())
+		verts.append(sf::Vertex(rc.GetGrid().GetPoint(m_overState.gridPoint), sf::Color::Green));
+
+	rc.GetWindow().draw(verts);
+
+	if (m_overState.snap != Snap::None)
+		drawCircle(m_overState.gridPoint, BigDotRadius, m_overState.snap == Snap::Object ? sf::Color::Yellow : IsClosed() ? sf::Color::Green : sf::Color::Red);
+}
+
+bool VectorTool::IsClosed() const
+{
+	return m_points.size() >= 3 && m_overState.snap != Snap::None && m_overState.gridPoint == m_points.front();
 }
 
 void VectorTool::OnMouseMoved(const sf::Vector2i& point)
 {
-	sf::Vector2f logPoint = m_view.DevToLog(point);
+	Update(m_view.DevToLog(point));
+}
 
-	float distanceSquared{};
-	m_gridPoint = m_view.GetGrid().GetNearestGridPoint(logPoint, &distanceSquared);
-	m_snapped = distanceSquared < SnappingDistance * SnappingDistance * m_view.GetDevToLogScale();
-
-	if (m_snapped && m_object && !m_object->GetPoints().empty() && m_object->GetPoints().back() != m_gridPoint)
+void VectorTool::Update(const sf::Vector2f& logPoint)
+{
+	if (m_objectEdit)
 	{
-		m_object->GetPoints().back() = m_gridPoint;
+		m_overState = HitTest(logPoint, m_objectEdit->object);
+		if (m_overState.vertex == m_objectEdit->start) // Back where we started.
+			m_overState.snap = Snap::None;
+
+		if (m_points.size() == 1) // Just started, don't know if internal/external yet. 
+		{
+			m_objectEdit->room = m_overState.room;
+		}
+		else if (m_overState.snap == Snap::Grid && m_overState.room != m_objectEdit->room)
+		{
+			m_overState.snap = Snap::None;
+		}
+
+		// TODO: Check polyline is completely in room (or completely outside).
 	}
+	else
+	{
+		m_overState = HitTest(logPoint, nullptr);
+
+		if (m_overState.snap == Snap::Grid && m_overState.room) // Can't start a new object in a room.
+			m_overState.snap = Snap::None;
+	}
+
+	if (m_overState.snap == Snap::None)
+		m_overState.gridPoint = m_view.GetGrid().GetGridPoint(logPoint);
+}
+
+VectorTool::OverState VectorTool::HitTest(const sf::Vector2f& logPoint, const Model::VectorObject* special) const
+{
+	OverState result;
+	
+	float gridDistanceSquared{};
+	result.gridPoint = sf::Vector2f(m_view.GetGrid().GetNearestGridPoint(logPoint, &gridDistanceSquared));
+	result.snap = Snap::Grid;
+
+	const Jig::EdgeMesh::Face* hitRoom{};
+	for (const auto& object : App::GetModel().GetObjects())
+		if (const Model::VectorObject* vector = dynamic_cast<const Model::VectorObject*>(object.get()))
+			if (result.room = vector->HitTestRooms(result.gridPoint))
+				break;
+
+	const auto objectPoint = m_view.GetGrid().GetGridPoint(logPoint);
+
+	Model::VectorObject::HitTestResult vectorHit;
+	Model::VectorObject* hitObject{};
+
+	auto tryEdges = [&](const auto* vectorObject)
+	{
+		const auto hit = vectorObject->HitTest(objectPoint, 1.0f);
+		if (hit.vert)
+		{
+			if (!vectorHit.vert || hit.distanceSquared < vectorHit.distanceSquared)
+			{
+				vectorHit = hit;
+				result.object = vectorObject;
+				result.vertex = hit.vert;
+			}
+		}
+	};
+
+	if (special)
+		tryEdges(special);
+	else
+		for (auto& object : App::GetModel().GetObjects())
+			if (Model::VectorObject* vectorObject = dynamic_cast<Model::VectorObject*>(object.get()))
+				tryEdges(vectorObject);
+
+	if (vectorHit.vert && (result.snap == Snap::None || vectorHit.distanceSquared < gridDistanceSquared + 1e-6))
+	{
+		result.gridPoint = sf::Vector2f(*vectorHit.vert);
+		result.snap = Snap::Object;
+	}
+
+	return result;
 }
 
 void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & point)
 {
-	if (!m_snapped)
+	if (m_overState.snap == Snap::None)
 		return;
 
-	if (m_object)
+	bool finished{};
+
+	if (m_points.empty() && m_overState.object)
 	{
-		if (m_object->IsClosed())
+		m_objectEdit = std::make_unique<ObjectEdit>();
+		m_objectEdit->object = m_overState.object;
+		m_objectEdit->start = m_overState.vertex;
+	}
+	else if (m_objectEdit)
+	{
+		if (finished = m_overState.snap == Snap::Object)
 		{
-			auto object = std::move(m_object);
-			if (object->Tesselate())
-				App::GetModel().AddObject(std::move(object));
+			m_points.clear();
+			m_objectEdit = nullptr;
 		}
-		else
-			m_object->GetPoints().push_back(m_gridPoint);
 	}
-	else
+	else if (IsClosed())
 	{
-		m_object = std::make_unique<Model::VectorObject>();
-		m_object->GetPoints().push_back(m_gridPoint);
-		m_object->GetPoints().push_back(m_gridPoint);
+		auto object = std::make_unique<Model::VectorObject>(m_points);
+		App::GetModel().AddObject(std::move(object));
+		finished = true;
+		m_points.clear();
 	}
+
+	if (!finished)
+		m_points.push_back(m_overState.gridPoint);
 }
