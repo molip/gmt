@@ -134,31 +134,9 @@ VectorObject::TriangleMeshPtr VectorObject::TesselateWall(const Jig::Polygon& po
 	return MakeTriangleMesh(triangulator.Go());
 }
 
-VectorObject::HitTestResult VectorObject::HitTest(const sf::Vector2f& point, float tolerance) const
+const Jig::EdgeMesh::Vert* VectorObject::FindNearestVert(const sf::Vector2f& point, float tolerance) const
 {
-	const float toleranceSquared = tolerance * tolerance;
-
-	float closestDistanceSquared = FLT_MAX;
-	const Jig::EdgeMesh::Vert* closestVert{};
-	
-	for (auto& vert : m_edgeMesh->GetVerts())
-	{
-		const float distanceSquared = Jig::Vec2f(point - sf::Vector2f(vert)).GetLengthSquared();
-		if (distanceSquared < closestDistanceSquared)
-		{
-			closestVert = &vert;
-			closestDistanceSquared = distanceSquared;
-		}
-	}
-
-	HitTestResult result;
-	if (closestDistanceSquared <= toleranceSquared)
-	{
-		result.distanceSquared = closestDistanceSquared;
-		result.vert = closestVert;
-	}
-	
-	return result;
+	return m_edgeMesh->FindNearestVert(point, tolerance);
 }
 
 const Jig::EdgeMesh::Face* VectorObject::HitTestRooms(const sf::Vector2f& point) const

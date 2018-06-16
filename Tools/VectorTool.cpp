@@ -107,19 +107,20 @@ VectorTool::OverState VectorTool::HitTest(const sf::Vector2f& logPoint, const Mo
 
 	const auto objectPoint = m_view.GetGrid().GetGridPoint(logPoint);
 
-	Model::VectorObject::HitTestResult vectorHit;
-	Model::VectorObject* hitObject{};
+	const Model::VectorObject* hitObject{};
+	const Jig::EdgeMesh::Vert* closestVert{};
+	float edgeDistanceSquared{};
 
 	auto tryEdges = [&](const auto* vectorObject)
 	{
-		const auto hit = vectorObject->HitTest(objectPoint, 1.0f);
-		if (hit.vert)
+		if (const Jig::EdgeMesh::Vert* vert = vectorObject->FindNearestVert(objectPoint, 1.0f))
 		{
-			if (!vectorHit.vert || hit.distanceSquared < vectorHit.distanceSquared)
+			const float distanceSquared = Jig::Vec2f(objectPoint - Jig::Vec2f(*vert)).GetLengthSquared();
+			if (!closestVert || distanceSquared < edgeDistanceSquared)
 			{
-				vectorHit = hit;
-				result.object = vectorObject;
-				result.vertex = hit.vert;
+				hitObject = vectorObject;
+				closestVert = vert;
+				edgeDistanceSquared = distanceSquared;
 			}
 		}
 	};
@@ -131,9 +132,11 @@ VectorTool::OverState VectorTool::HitTest(const sf::Vector2f& logPoint, const Mo
 			if (Model::VectorObject* vectorObject = dynamic_cast<Model::VectorObject*>(object.get()))
 				tryEdges(vectorObject);
 
-	if (vectorHit.vert && (result.snap == Snap::None || vectorHit.distanceSquared < gridDistanceSquared + 1e-6))
+	if (closestVert && (result.snap == Snap::None || edgeDistanceSquared < gridDistanceSquared + 1e-6))
 	{
-		result.gridPoint = sf::Vector2f(*vectorHit.vert);
+		result.object = hitObject;
+		result.vertex = closestVert;
+		result.gridPoint = sf::Vector2f(*closestVert);
 		result.snap = Snap::Object;
 	}
 

@@ -25,13 +25,7 @@ namespace GMT::Model
 
 		virtual void Draw(RenderContext& rc) const override;
 
-		struct HitTestResult
-		{
-			const Jig::EdgeMesh::Vert* vert = {};
-			float distanceSquared = 0;
-		};
-		
-		HitTestResult HitTest(const sf::Vector2f& point, float tolerance) const;
+		const Jig::EdgeMesh::Vert* FindNearestVert(const sf::Vector2f& point, float tolerance) const;
 		const Jig::EdgeMesh::Face* HitTestRooms(const sf::Vector2f& point) const;
 
 	private:
