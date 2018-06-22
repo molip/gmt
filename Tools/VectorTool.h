@@ -32,7 +32,7 @@ namespace GMT::Tools
 		{
 			const Model::VectorObject* object{};
 			const Jig::EdgeMesh::Face* room{};
-			Jig::EdgeMesh::VertPtr vertex{};
+			const Jig::EdgeMesh::Vert* vertex{};
 			sf::Vector2f gridPoint; // Model coords.
 			Snap snap = Snap::None;
 		};
@@ -41,7 +41,7 @@ namespace GMT::Tools
 		{
 			const Model::VectorObject* object{};
 			const Jig::EdgeMesh::Face* room{};
-			Jig::EdgeMesh::VertPtr start{}, end{};
+			const Jig::EdgeMesh::Vert *start{}, *end{};
 		};
 
 		bool IsClosed() const;

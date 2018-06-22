@@ -1,6 +1,9 @@
 #include "VectorObject.h"
 #include "../Grid.h"
 
+#include "Jig/EdgeMeshAddFace.h"
+#include "Jig/Geometry.h"
+#include "Jig/Line2.h"
 #include "Jig/Mitre.h"
 #include "Jig/Polygon.h"
 #include "Jig/Triangulator.h"
@@ -17,7 +20,7 @@ namespace
 
 VectorObject::VectorObject(const std::vector<sf::Vector2f>& points)
 {
-	Tesselate(points);		  
+	Init(points);
 }
 
 VectorObject::~VectorObject() = default;
@@ -29,20 +32,34 @@ void VectorObject::Draw(RenderContext& rc) const
 		verts.append(sf::Vertex(rc.GetGrid().GetPoint(point), colour));
 	};
 
-	if (m_floor)
+	for (auto& floor : m_floors)
 	{
-		sf::VertexArray floor(sf::Triangles), walls(sf::Triangles);
+		sf::VertexArray verts(sf::Triangles);
 
-		for (auto& point : *m_floor)
-			addPoint(floor, point, sf::Color::Green);
+		for (auto& point : *floor)
+			addPoint(verts, point, sf::Color::Magenta);
 
-		if (m_walls)
-			for (auto& point : *m_walls)
-				addPoint(walls, point, sf::Color::Red);
-
-		rc.GetWindow().draw(floor);
-		rc.GetWindow().draw(walls);
+		rc.GetWindow().draw(verts);
 	}
+
+	for (auto& wall : m_walls)
+	{
+		sf::VertexArray verts(sf::Triangles);
+
+		for (auto& point : *wall)
+			addPoint(verts, point, sf::Color::Red);
+
+		rc.GetWindow().draw(verts);
+	}
+}
+
+bool VectorObject::AddWall(const Jig::PolyLine& polyline, const Jig::EdgeMesh::Vert& start, const Jig::EdgeMesh::Vert& end)
+{
+	if (!Jig::EdgeMeshAddFace(*m_edgeMesh, const_cast<Jig::EdgeMesh::Vert&>(start), const_cast<Jig::EdgeMesh::Vert&>(end), polyline))
+		return false;
+
+	Update();
+	return true;
 }
 
 VectorObject::TriangleMeshPtr VectorObject::MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const
@@ -56,7 +73,7 @@ VectorObject::TriangleMeshPtr VectorObject::MakeTriangleMesh(const Jig::EdgeMesh
 	return mesh;
 }
 
-bool VectorObject::Tesselate(std::vector<sf::Vector2f> points)
+bool VectorObject::Init(std::vector<sf::Vector2f> points)
 {
 	if (points.empty())
 		return false;
@@ -77,27 +94,38 @@ bool VectorObject::Tesselate(std::vector<sf::Vector2f> points)
 	if (poly.IsSelfIntersecting())
 		return false;
 
-	std::vector<Jig::EdgeMesh::Vert> verts;
+	std::vector<Jig::EdgeMesh::VertPtr> verts;
 	verts.reserve(poly.size());
 	for (const auto& point : poly)
-		verts.push_back(point);
+		verts.push_back(std::make_unique<Jig::EdgeMesh::Vert>(point));
 
-	// TODO: EdgeMesh::Face should have vert indices (not ptrs) so we can add verts.
-	// Or EdgeMesh::m_verts should be a vector of unique_ptrs.
-	m_edgeMesh = std::make_unique<Jig::EdgeMesh>(std::move(verts)); 
+	m_edgeMesh = std::make_unique<Jig::EdgeMesh>(std::move(verts));
+	m_edgeMesh->SetEnableVisiblePoints(false);
 
 	auto face = std::make_unique<Jig::EdgeMesh::Face>();
 	for (const auto& vert : m_edgeMesh->GetVerts())
-		face->AddAndConnectEdge(&vert);	
+		face->AddAndConnectEdge(vert.get());
 
 	m_edgeMesh->AddFace(std::move(face));
-	m_edgeMesh->Update();
 
-	auto poly2 = m_edgeMesh->GetFaces().front()->GetPolygon();
-	m_floor = MakeTriangleMesh(Jig::Triangulator(poly2).Go());
-	m_walls = TesselateWall(poly2);
+	Update();
 
 	return true;
+}
+
+void VectorObject::Update()
+{
+	m_edgeMesh->Update();
+
+	m_floors.clear();
+	m_walls.clear();
+
+	for (auto& face : m_edgeMesh->GetFaces())
+	{
+		auto poly = face->GetPolygon();
+		m_floors.push_back(MakeTriangleMesh(Jig::Triangulator(poly).Go()));
+		m_walls.push_back(TesselateWall(poly));
+	}
 }
 
 VectorObject::TriangleMeshPtr VectorObject::TesselateWall(const Jig::Polygon& poly) const

@@ -7,6 +7,8 @@
 #include "../Model/Model.h"
 #include "../Model/VectorObject.h"
 
+#include "Jig/PolyLine.h"
+
 #include <SFML/Graphics.hpp>
 
 using namespace GMT;
@@ -160,6 +162,14 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 	{
 		if (finished = m_overState.snap == Snap::Object)
 		{
+			m_points.erase(m_points.begin());
+			
+			Jig::PolyLine poly;
+			for (auto& point : m_points)
+				poly.push_back(Jig::Vec2(point));
+
+			const_cast<Model::VectorObject*>(m_objectEdit->object)->AddWall(poly, *m_objectEdit->start, *m_overState.vertex);
+			
 			m_points.clear();
 			m_objectEdit = nullptr;
 		}
