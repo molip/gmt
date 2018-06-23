@@ -11,6 +11,7 @@ Grid::Grid(int widthPixels, int heightPixels, int cellSize) :
 	m_borderX((widthPixels - m_cellsX * cellSize) / 2),
 	m_borderY((heightPixels - m_cellsY * cellSize) / 2)
 {
+	m_xform.translate(m_borderX, m_borderY).scale(m_cellSize, m_cellSize);
 }
 
 sf::Vector2f Grid::GetPoint(sf::Vector2i gridPoint) const
@@ -20,12 +21,12 @@ sf::Vector2f Grid::GetPoint(sf::Vector2i gridPoint) const
 
 sf::Vector2f Grid::GetPoint(sf::Vector2f gridPoint) const
 {
-	return { float(m_borderX + gridPoint.x * m_cellSize), float(m_borderY + gridPoint.y * m_cellSize) };
+	return GetTransform().transformPoint(gridPoint);
 }
 
 sf::Vector2f Grid::GetGridPoint(sf::Vector2f point) const
 {
-	return { float((point.x - m_borderX) / m_cellSize), float((point.y - m_borderY) / m_cellSize) };
+	return GetTransform().getInverse().transformPoint(point);
 }
 
 sf::Vector2i Grid::GetNearestGridPoint(sf::Vector2f point, float* distanceSquared) const
