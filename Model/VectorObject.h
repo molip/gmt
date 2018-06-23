@@ -6,13 +6,20 @@
 #include "Jig/VectorFwd.h"
 
 #include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
 
 #include <optional>
 #include <vector>
 
 namespace Jig
 {
-	class Polygon;
+	class PolyLine;
+	enum class LineAlignment;
+}
+
+namespace sf
+{
+	class Texture;
 }
 
 namespace GMT::Model
@@ -38,11 +45,15 @@ namespace GMT::Model
 		bool Init(std::vector<sf::Vector2f> points);
 		void Update();
 
-		TriangleMeshPtr TesselateWall(const Jig::Polygon& poly) const;
+		void UpdateFloors();
+		void UpdateWalls();
+		void UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment alignment);
+
 		TriangleMeshPtr MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const;
 
-		std::vector<TriangleMeshPtr> m_floors, m_walls;
+		sf::VertexArray	m_floors, m_walls;
 
 		std::unique_ptr<Jig::EdgeMesh> m_edgeMesh;
+		std::unique_ptr<sf::Texture> m_wallTexture, m_floorTexture;
 	};
 }
