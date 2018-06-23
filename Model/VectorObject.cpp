@@ -2,11 +2,14 @@
 #include "../Grid.h"
 
 #include "Jig/EdgeMeshAddFace.h"
+#include "Jig/EdgeMeshInternalEdges.h"
 #include "Jig/Geometry.h"
 #include "Jig/Line2.h"
 #include "Jig/Mitre.h"
 #include "Jig/Polygon.h"
 #include "Jig/Triangulator.h"
+
+#include "libKernel/FormatString.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -112,6 +115,7 @@ bool VectorObject::Init(std::vector<sf::Vector2f> points)
 void VectorObject::Update()
 {
 	m_edgeMesh->Update();
+	m_edgeMesh->Dump();
 
 	UpdateFloors();
 	UpdateWalls();
@@ -139,11 +143,21 @@ void VectorObject::UpdateWalls()
 
 	UpdateWalls(m_edgeMesh->GetOuterPolygon(), Jig::LineAlignment::Outer);
 
+	Jig::EdgeMeshInternalEdges emie(*m_edgeMesh);
+
+	for (auto& line : emie.m_lines)
+	{
+		Jig::PolyLine poly{ line.GetP0(), line.GetP1() };
+		UpdateWalls(poly, Jig::LineAlignment::Centre);
+	}
 }
 
 void VectorObject::UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment alignment)
 {
-	Jig::Polygon inner, outer;
+	Jig::PolyLine inner, outer;
+	inner.SetClosed(polyline.IsClosed());
+	outer.SetClosed(polyline.IsClosed());
+
 	for (size_t i = 0; i < polyline.size(); ++i)
 	{
 		Jig::Vec2f prev, next;
@@ -177,7 +191,7 @@ void VectorObject::UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment
 		return;
 	}
 
-	for (size_t i = 0; i < outer.size(); ++i)
+	for (int i = 0; i < outer.GetSegmentCount(); ++i)
 	{
 		const Jig::Vec2f outer0 = outer.GetVertex(i);
 		const Jig::Vec2f inner0 = inner.GetVertex(i);
