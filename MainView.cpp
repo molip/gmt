@@ -44,16 +44,18 @@ void MainView::Draw(sf::RenderWindow& window) const
 		border[i].color = sf::Color::White;
 
 	sf::VertexArray gridLines(sf::Lines);
+	sf::Color gridColour = sf::Color::Yellow;
+	gridColour.a = 128;
 	for (int x = 0; x <= m_grid.GetCellCountX(); ++x)
 	{
-		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(x, 0)), sf::Color::Yellow));
-		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(x, m_grid.GetCellCountY())), sf::Color::Yellow));
+		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(x, 0)), gridColour));
+		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(x, m_grid.GetCellCountY())), gridColour));
 	}
 
 	for (int y = 0; y <= m_grid.GetCellCountY(); ++y)
 	{
-		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(0, y)), sf::Color::Yellow));
-		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(m_grid.GetCellCountX(), y)), sf::Color::Yellow));
+		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(0, y)), gridColour));
+		gridLines.append(sf::Vertex(m_grid.GetPoint(sf::Vector2i(m_grid.GetCellCountX(), y)), gridColour));
 	}
 
 	window.draw(border);
