@@ -9,6 +9,8 @@
 
 #include "Jig/PolyLine.h"
 
+#include "libKernel/MinFinder.h"
+
 #include <SFML/Graphics.hpp>
 
 using namespace GMT;
@@ -109,22 +111,13 @@ VectorTool::OverState VectorTool::HitTest(const sf::Vector2f& logPoint, const Mo
 
 	const auto objectPoint = m_view.GetGrid().GetGridPoint(logPoint);
 
-	const Model::VectorObject* hitObject{};
-	const Jig::EdgeMesh::Vert* closestVert{};
-	float edgeDistanceSquared{};
+	using HitVert = std::pair<const Jig::EdgeMesh::Vert*, const Model::VectorObject*>;
+	Kernel::MinFinder<HitVert, float> minFinder(gridDistanceSquared * (FLT_EPSILON + 1));
 
 	auto tryEdges = [&](const auto* vectorObject)
 	{
 		if (const Jig::EdgeMesh::Vert* vert = vectorObject->FindNearestVert(objectPoint, 1.0f))
-		{
-			const float distanceSquared = Jig::Vec2f(objectPoint - Jig::Vec2f(*vert)).GetLengthSquared();
-			if (!closestVert || distanceSquared < edgeDistanceSquared)
-			{
-				hitObject = vectorObject;
-				closestVert = vert;
-				edgeDistanceSquared = distanceSquared;
-			}
-		}
+			minFinder.Try(HitVert(vert, vectorObject), Jig::Vec2f(objectPoint - Jig::Vec2f(*vert)).GetLengthSquared());
 	};
 
 	if (special)
@@ -134,11 +127,11 @@ VectorTool::OverState VectorTool::HitTest(const sf::Vector2f& logPoint, const Mo
 			if (Model::VectorObject* vectorObject = dynamic_cast<Model::VectorObject*>(object.get()))
 				tryEdges(vectorObject);
 
-	if (closestVert && (result.snap == Snap::None || edgeDistanceSquared < gridDistanceSquared + 1e-6))
+	if (minFinder.GetObject().first)
 	{
-		result.object = hitObject;
-		result.vertex = closestVert;
-		result.gridPoint = sf::Vector2f(*closestVert);
+		result.vertex = minFinder.GetObject().first;
+		result.object = minFinder.GetObject().second;
+		result.gridPoint = sf::Vector2f(*result.vertex);
 		result.snap = Snap::Object;
 	}
 
