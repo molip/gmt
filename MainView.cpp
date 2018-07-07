@@ -107,3 +107,8 @@ void MainView::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point)
 {
 	m_tool->OnMouseDown(button, point);
 }
+
+void MainView::OnKeyPressed(const sf::Event::KeyEvent event) 
+{
+	m_tool->OnKeyPressed(event);
+}

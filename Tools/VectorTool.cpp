@@ -197,3 +197,19 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 	if (!finished)
 		m_points.push_back(m_overState.gridPoint);
 }
+
+void VectorTool::OnKeyPressed(const sf::Event::KeyEvent event)
+{
+	if (m_points.empty())
+		return;
+
+	if (event.code == sf::Keyboard::Escape)
+		m_points.clear();
+	else if (event.code == sf::Keyboard::BackSpace)
+		m_points.pop_back();
+	else
+		return;
+
+	if (m_points.empty())
+		m_objectEdit = nullptr;
+}

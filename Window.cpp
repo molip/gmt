@@ -67,6 +67,9 @@ void Window::PumpEvent(const sf::Event& event)
 	case sf::Event::MouseButtonReleased:
 		OnMouseUp(event.mouseButton);
 		break;
+	case sf::Event::KeyPressed:
+		m_mainView->OnKeyPressed(event.key);
+		break;
 	}
 }
 

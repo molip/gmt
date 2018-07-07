@@ -21,6 +21,7 @@ namespace GMT::Tools
 		virtual void Draw(RenderContext& rc) const override;
 		virtual void OnMouseMoved(const sf::Vector2i& point) override;
 		virtual void OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point) override;
+		virtual void OnKeyPressed(const sf::Event::KeyEvent event) override;
 
 	private:
 		enum class Snap { None, Grid, Vert, Edge};

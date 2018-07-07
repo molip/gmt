@@ -34,6 +34,8 @@ namespace GMT
 		virtual void OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point) {}
 		virtual void OnMouseUp(sf::Mouse::Button button, const sf::Vector2i& point) {}
 
+		virtual void OnKeyPressed(const sf::Event::KeyEvent event) {}
+
 		sf::Vector2i WorldToLocal(const sf::Vector2i& point) const;
 		sf::Vector2f DevToLog(const sf::Vector2i& point) const;
 
