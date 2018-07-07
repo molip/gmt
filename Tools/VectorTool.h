@@ -2,16 +2,13 @@
 
 #include "Tool.h"
 
+#include "../Model/VectorObject.h"
+
 #include "Jig/EdgeMesh.h"
 
 namespace GMT
 {
 	class MainView;
-}
-
-namespace GMT::Model
-{
-	class VectorObject;
 }
 
 namespace GMT::Tools
@@ -26,13 +23,14 @@ namespace GMT::Tools
 		virtual void OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point) override;
 
 	private:
-		enum class Snap { None, Grid, Object };
+		enum class Snap { None, Grid, Vert, Edge};
+		using Terminus = Model::VectorObject::Terminus;
 
 		struct OverState
 		{
 			const Model::VectorObject* object{};
 			const Jig::EdgeMesh::Face* room{};
-			const Jig::EdgeMesh::Vert* vertex{};
+			Terminus terminus{};
 			sf::Vector2f gridPoint; // Model coords.
 			Snap snap = Snap::None;
 		};
@@ -41,7 +39,7 @@ namespace GMT::Tools
 		{
 			const Model::VectorObject* object{};
 			const Jig::EdgeMesh::Face* room{};
-			const Jig::EdgeMesh::Vert *start{}, *end{};
+			Terminus start, end;
 		};
 
 		bool IsClosed() const;

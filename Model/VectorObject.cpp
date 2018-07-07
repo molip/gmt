@@ -4,12 +4,13 @@
 #include "Jig/EdgeMeshAddFace.h"
 #include "Jig/EdgeMeshInternalEdges.h"
 #include "Jig/Geometry.h"
-#include "Jig/Line2.h"
 #include "Jig/Mitre.h"
 #include "Jig/Polygon.h"
 #include "Jig/Triangulator.h"
 
 #include "libKernel/FormatString.h"
+#include "libKernel/Math.h"
+#include "libKernel/MinFinder.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -54,9 +55,29 @@ void VectorObject::Draw(RenderContext& rc) const
 	rc.GetWindow().draw(m_walls, renderStates);
 }
 
-bool VectorObject::AddWall(const Jig::PolyLine& polyline, const Jig::EdgeMesh::Vert& start, const Jig::EdgeMesh::Vert& end)
+bool VectorObject::AddWall(const Jig::PolyLine& polyline, const Terminus& start, const Terminus& end)
 {
-	if (!Jig::EdgeMeshAddFace(*m_edgeMesh, const_cast<Jig::EdgeMesh::Vert&>(start), const_cast<Jig::EdgeMesh::Vert&>(end), polyline))
+	auto getVert = [&](const Terminus& term)
+	{
+		const Jig::EdgeMesh::Vert* result{};
+
+		if (auto* vertTerm = term.GetVert())
+		{
+			result = *vertTerm;
+		}
+		else if (auto* edgeTerm = term.GetEdge())
+		{
+			auto& newEdge = m_edgeMesh->InsertVert(edgeTerm->second, *const_cast<Jig::EdgeMesh::Edge*>(edgeTerm->first));
+			result = newEdge.vert;
+		}
+			
+		return const_cast<Jig::EdgeMesh::Vert*>(result);
+	};
+	
+	Jig::EdgeMesh::Vert* startVert = getVert(start);
+	Jig::EdgeMesh::Vert* endVert = getVert(end);
+
+	if (!Jig::EdgeMeshAddFace(*m_edgeMesh, *startVert, *endVert, polyline))
 		return false;
 
 	Update();
@@ -126,7 +147,9 @@ void VectorObject::UpdateFloors()
 	m_floors.clear();
 
 	const Jig::Vec2f texSize(m_floorTexture->getSize());
-	m_floors.clear();
+
+	if (texSize.IsZero())
+		return;
 
 	for (auto& face : m_edgeMesh->GetFaces())
 	{
@@ -158,7 +181,7 @@ void VectorObject::UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment
 	inner.SetClosed(polyline.IsClosed());
 	outer.SetClosed(polyline.IsClosed());
 
-	for (size_t i = 0; i < polyline.size(); ++i)
+	for (int i = 0; i < polyline.size(); ++i)
 	{
 		Jig::Vec2f prev, next;
 		const Jig::Vec2f point = polyline.GetVertex(i);
@@ -231,16 +254,69 @@ void VectorObject::UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment
 	}
 }
 
-const Jig::EdgeMesh::Vert* VectorObject::FindNearestVert(const sf::Vector2f& point, float tolerance) const
+using HitTester = Kernel::MinFinder<VectorObject::Terminus, float>;
+
+namespace
 {
-	return m_edgeMesh->FindNearestVert(point, tolerance);
+	template <typename T>
+	void HitTestEdges(const sf::Vector2f& point, float tolerance, const T& loop, HitTester& hitTester)
+	{
+		for (const Jig::EdgeMesh::Edge& edge : loop)
+		{
+			const auto line = Jig::Line2::MakeFinite(*edge.vert, *T::GetNext(edge).vert);
+			Jig::Rect bbox = line.GetBBox();
+			bbox.Inflate(tolerance, tolerance);
+			if (!bbox.Contains(point))
+				continue;
+			
+			Jig::Vec2 intersect;
+			if (line.PerpIntersect(point, nullptr, &intersect))
+			{
+				if (!line.IsVertical())
+				{
+					double x = int(intersect.x + 0.5);
+					if (x > bbox.m_p0.x && x < bbox.m_p1.x && !Kernel::fcomp(x, line.GetP0().x) && !Kernel::fcomp(x, line.GetP1().x))
+					{
+						const Jig::Vec2 snapped(x, intersect.y + (x - intersect.x) * line.GetGradient());
+						hitTester.Try(VectorObject::EdgeTerminus(&edge, snapped), Jig::Vec2f(Jig::Vec2f(snapped) - point).GetLengthSquared());
+					}
+				}
+
+				if (!line.IsHorizontal())
+				{
+					double y = int(intersect.y + 0.5);
+					if (y > bbox.m_p0.y && y < bbox.m_p1.y && !Kernel::fcomp(y, line.GetP0().y) && !Kernel::fcomp(y, line.GetP1().y))
+					{
+						double dx = line.IsVertical() ? 0 : (y - intersect.y) / line.GetGradient();
+						const Jig::Vec2 snapped(intersect.x + dx, y);
+						hitTester.Try(VectorObject::EdgeTerminus(&edge, snapped), Jig::Vec2f(Jig::Vec2f(snapped) - point).GetLengthSquared());
+					}
+				}
+			}
+		}
+	}
+}
+
+VectorObject::Terminus VectorObject::HitTestEdges(const sf::Vector2f& point, float tolerance, float& distSquared) const
+{
+	HitTester hitTester(tolerance);
+	
+	if (auto* vert = m_edgeMesh->FindNearestVert(point, tolerance))
+		hitTester.Try(vert, (float)(Jig::Vec2(Jig::Vec2(point) - *vert).GetLengthSquared()));
+
+	if (auto* face = HitTestRooms(point))
+		::HitTestEdges(point, tolerance, face->GetEdges(), hitTester);
+	else
+	{
+		const Jig::EdgeMesh& edgeMesh = *m_edgeMesh;
+		::HitTestEdges(point, tolerance, edgeMesh.GetOuterEdges(), hitTester);
+	}
+
+	distSquared = hitTester.GetValue();
+	return hitTester.GetObject();
 }
 
 const Jig::EdgeMesh::Face* VectorObject::HitTestRooms(const sf::Vector2f& point) const
 {
-	for (auto& face : m_edgeMesh->GetFaces())
-		if (face->Contains(point))
-			return face.get();
-
-	return nullptr;
+	return m_edgeMesh->HitTest(Jig::Vec2(point));
 }

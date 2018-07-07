@@ -3,12 +3,14 @@
 #include "Object.h"
 
 #include "Jig/EdgeMesh.h"
+#include "Jig/Line2.h"
 #include "Jig/VectorFwd.h"
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
 #include <optional>
+#include <variant>
 #include <vector>
 
 namespace Jig
@@ -32,10 +34,28 @@ namespace GMT::Model
 
 		virtual void Draw(RenderContext& rc) const override;
 
-		const Jig::EdgeMesh::Vert* FindNearestVert(const sf::Vector2f& point, float tolerance) const;
+		using VertTerminus = const Jig::EdgeMesh::Vert*;
+		using EdgeTerminus = std::pair<const Jig::EdgeMesh::Edge*, Jig::Vec2>;
+		struct Terminus : public std::variant<std::monostate, VertTerminus, EdgeTerminus>
+		{
+			using std::variant<std::monostate, VertTerminus, EdgeTerminus>::variant;
+			const VertTerminus* GetVert() const { return std::get_if<VertTerminus>(this); }
+			const EdgeTerminus* GetEdge() const { return std::get_if<EdgeTerminus>(this); }
+			bool IsEmpty() const { return index() == 0; }
+			const Jig::Vec2* GetPoint() const
+			{
+				if (auto vert = GetVert())
+					return *vert;
+				if (auto edge = GetEdge())
+					return &edge->second;
+				return nullptr;
+			}
+		};
+
+		Terminus HitTestEdges(const sf::Vector2f& point, float tolerance, float& distSquared) const;
 		const Jig::EdgeMesh::Face* HitTestRooms(const sf::Vector2f& point) const;
 
-		bool AddWall(const Jig::PolyLine& polyline, const Jig::EdgeMesh::Vert& start, const Jig::EdgeMesh::Vert& end);
+		bool AddWall(const Jig::PolyLine& polyline, const Terminus& start, const Terminus& end);
 
 	private:
 		using WallPoints = std::optional<std::pair<Jig::Vec2f, Jig::Vec2f>>;

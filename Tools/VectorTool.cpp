@@ -5,7 +5,6 @@
 #include "../RenderContext.h"
 
 #include "../Model/Model.h"
-#include "../Model/VectorObject.h"
 
 #include "Jig/PolyLine.h"
 
@@ -51,7 +50,15 @@ void VectorTool::Draw(RenderContext& rc) const
 	rc.GetWindow().draw(verts);
 
 	if (m_overState.snap != Snap::None)
-		drawCircle(m_overState.gridPoint, BigDotRadius, m_overState.snap == Snap::Object ? sf::Color::Yellow : IsClosed() ? sf::Color::Green : sf::Color::Red);
+	{
+		auto colour =
+			m_overState.snap == Snap::Edge ? sf::Color::Blue :
+			m_overState.snap == Snap::Vert ? sf::Color::Yellow :
+			IsClosed() ? sf::Color::Green :
+			sf::Color::Red;
+	
+		drawCircle(m_overState.gridPoint, BigDotRadius, colour);
+	}
 }
 
 bool VectorTool::IsClosed() const
@@ -69,7 +76,7 @@ void VectorTool::Update(const sf::Vector2f& logPoint)
 	if (m_objectEdit)
 	{
 		m_overState = HitTest(logPoint, m_objectEdit->object);
-		if (m_overState.vertex == m_objectEdit->start) // Back where we started.
+		if (m_overState.terminus == m_objectEdit->start) // Back where we started.
 			m_overState.snap = Snap::None;
 
 		if (m_points.size() == 1) // Just started, don't know if internal/external yet. 
@@ -100,39 +107,51 @@ VectorTool::OverState VectorTool::HitTest(const sf::Vector2f& logPoint, const Mo
 	OverState result;
 	
 	float gridDistanceSquared{};
-	result.gridPoint = sf::Vector2f(m_view.GetGrid().GetNearestGridPoint(logPoint, &gridDistanceSquared));
-	result.snap = Snap::Grid;
+	const sf::Vector2f gridPoint(m_view.GetGrid().GetNearestGridPoint(logPoint, &gridDistanceSquared));
 
 	const Jig::EdgeMesh::Face* hitRoom{};
 	for (const auto& object : App::GetModel().GetObjects())
 		if (const Model::VectorObject* vector = dynamic_cast<const Model::VectorObject*>(object.get()))
-			if (result.room = vector->HitTestRooms(result.gridPoint))
+			if (result.room = vector->HitTestRooms(gridPoint))
 				break;
 
 	const auto objectPoint = m_view.GetGrid().GetGridPoint(logPoint);
 
-	using HitVert = std::pair<const Jig::EdgeMesh::Vert*, const Model::VectorObject*>;
-	Kernel::MinFinder<HitVert, float> minFinder(gridDistanceSquared * (FLT_EPSILON + 1));
+	using HitGrid = sf::Vector2f;
+	using HitResult = std::variant<std::monostate, Terminus, HitGrid>;
+	Kernel::MinFinder<HitResult, float> minFinder(0.5f); // 0.5^2 + 0.5^2
 
-	auto tryEdges = [&](const auto* vectorObject)
+	const Model::VectorObject* hitObject{};
+
+	auto tryObjectEdges = [&](const Model::VectorObject* vectorObject)
 	{
-		if (const Jig::EdgeMesh::Vert* vert = vectorObject->FindNearestVert(objectPoint, 1.0f))
-			minFinder.Try(HitVert(vert, vectorObject), Jig::Vec2f(objectPoint - Jig::Vec2f(*vert)).GetLengthSquared());
+		float distSquared{};
+		auto result = vectorObject->HitTestEdges(objectPoint, std::sqrt(minFinder.GetValue()), distSquared);
+		if (minFinder.Try(result, distSquared))
+			hitObject = vectorObject;
 	};
 
 	if (special)
-		tryEdges(special);
+		tryObjectEdges(special);
 	else
 		for (auto& object : App::GetModel().GetObjects())
 			if (Model::VectorObject* vectorObject = dynamic_cast<Model::VectorObject*>(object.get()))
-				tryEdges(vectorObject);
+				tryObjectEdges(vectorObject);
 
-	if (minFinder.GetObject().first)
+	minFinder.Try(gridPoint, gridDistanceSquared);
+
+	auto& results = minFinder.GetObject();
+	if (auto terminusResult = std::get_if<Terminus>(&results))
 	{
-		result.vertex = minFinder.GetObject().first;
-		result.object = minFinder.GetObject().second;
-		result.gridPoint = sf::Vector2f(*result.vertex);
-		result.snap = Snap::Object;
+		result.terminus = *terminusResult;
+		result.object = hitObject;
+		result.gridPoint = sf::Vector2f(*terminusResult->GetPoint());
+		result.snap = terminusResult->GetEdge() ? Snap::Edge : Snap::Vert;
+	}
+	else if (auto gridResult = std::get_if<HitGrid>(&results))
+	{
+		result.gridPoint = gridPoint;
+		result.snap = Snap::Grid;
 	}
 
 	return result;
@@ -149,11 +168,11 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 	{
 		m_objectEdit = std::make_unique<ObjectEdit>();
 		m_objectEdit->object = m_overState.object;
-		m_objectEdit->start = m_overState.vertex;
+		m_objectEdit->start = m_overState.terminus;
 	}
 	else if (m_objectEdit)
 	{
-		if (finished = m_overState.snap == Snap::Object)
+		if (finished = m_overState.snap == Snap::Edge || m_overState.snap == Snap::Vert)
 		{
 			m_points.erase(m_points.begin());
 			
@@ -161,7 +180,7 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 			for (auto& point : m_points)
 				poly.push_back(Jig::Vec2(point));
 
-			const_cast<Model::VectorObject*>(m_objectEdit->object)->AddWall(poly, *m_objectEdit->start, *m_overState.vertex);
+			const_cast<Model::VectorObject*>(m_objectEdit->object)->AddWall(poly, m_objectEdit->start, m_overState.terminus);
 			
 			m_points.clear();
 			m_objectEdit = nullptr;
