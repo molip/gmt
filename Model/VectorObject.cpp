@@ -122,7 +122,6 @@ bool VectorObject::Init(std::vector<sf::Vector2f> points)
 		verts.push_back(std::make_unique<Jig::EdgeMesh::Vert>(point));
 
 	m_edgeMesh = std::make_unique<Jig::EdgeMesh>(std::move(verts));
-	m_edgeMesh->SetEnableVisiblePoints(false);
 
 	auto face = std::make_unique<Jig::EdgeMesh::Face>();
 	for (const auto& vert : m_edgeMesh->GetVerts())
