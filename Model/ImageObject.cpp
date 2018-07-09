@@ -5,6 +5,8 @@
 using namespace GMT;
 using namespace GMT::Model;
 
+REGISTER_DYNAMIC(ImageObject)
+
 ImageObject::ImageObject()
 {
 	m_texture = std::make_unique<sf::Texture>();

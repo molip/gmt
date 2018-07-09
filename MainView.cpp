@@ -110,5 +110,8 @@ void MainView::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point)
 
 void MainView::OnKeyPressed(const sf::Event::KeyEvent event) 
 {
-	m_tool->OnKeyPressed(event);
+	if (event.code == sf::Keyboard::S)
+		App::GetModel().SaveFile();
+	else
+		m_tool->OnKeyPressed(event);
 }

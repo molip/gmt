@@ -1,5 +1,7 @@
 #pragma once
 
+#include "libKernel/Serial.h"
+
 #include <memory>
 #include <vector>
 
@@ -20,6 +22,12 @@ namespace GMT::Model
 		
 		Model();
 		~Model();
+
+		bool LoadFile();
+		void SaveFile() const;
+
+		void Load(const Kernel::Serial::LoadNode& node);
+		void Save(Kernel::Serial::SaveNode& node) const;
 
 		void Draw(RenderContext& rc) const;
 

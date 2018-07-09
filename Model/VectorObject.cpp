@@ -24,10 +24,10 @@ namespace
 	const Jig::Vec2f WallTextureScale(0.5f, 0.5f);
 }
 
-VectorObject::VectorObject(const std::vector<sf::Vector2f>& points)
-{
-	Init(points);
+REGISTER_DYNAMIC(VectorObject)
 
+VectorObject::VectorObject()
+{
 	m_wallTexture = std::make_unique<sf::Texture>();
 	m_wallTexture->loadFromFile("wall.jpg");
 	m_wallTexture->setRepeated(true);
@@ -38,11 +38,27 @@ VectorObject::VectorObject(const std::vector<sf::Vector2f>& points)
 
 	m_floors.setPrimitiveType(sf::Triangles);
 	m_walls.setPrimitiveType(sf::Triangles);
+}
+
+VectorObject::VectorObject(const std::vector<sf::Vector2f>& points) : VectorObject()
+{
+	Init(points);
 
 	Update();
 }
 
 VectorObject::~VectorObject() = default;
+
+void VectorObject::Save(Kernel::Serial::SaveNode & node) const
+{
+	node.SaveClassPtr("mesh", m_edgeMesh);
+}
+
+void VectorObject::Load(const Kernel::Serial::LoadNode & node)
+{
+	node.LoadClassPtr("mesh", m_edgeMesh);
+	Update();
+}
 
 void VectorObject::Draw(RenderContext& rc) const
 {

@@ -29,8 +29,12 @@ namespace GMT::Model
 	class VectorObject : public Object
 	{
 	public:
+		VectorObject();
 		VectorObject(const std::vector<sf::Vector2f>& points);
 		virtual ~VectorObject();
+
+		virtual void Save(Kernel::Serial::SaveNode& node) const;
+		virtual void Load(const Kernel::Serial::LoadNode& node);
 
 		virtual void Draw(RenderContext& rc) const override;
 

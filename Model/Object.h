@@ -2,9 +2,11 @@
 
 #include "../RenderContext.h"
 
-namespace GMT::Model
+#include "libKernel/Dynamic.h"
+
+namespace GMT::Model 
 {
-	class Object
+	class Object : public Kernel::Dynamic
 	{
 	public:
 		Object();
