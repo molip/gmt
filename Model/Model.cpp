@@ -12,10 +12,6 @@ namespace
 	//const std::wstring TestPath = L"E:\\Users\\Jon\\Documents\\GMT\\Test.xml";
 }
 
-GMT::Model::Model::Model()
-{
-}
-
 GMT::Model::Model::~Model() = default;
 
 bool GMT::Model::Model::LoadFile()
@@ -51,8 +47,14 @@ void GMT::Model::Model::Draw(RenderContext& rc) const
 		object->Draw(rc);
 }
 
-Object& GMT::Model::Model::AddObject(ObjectPtr object)
+void GMT::Model::Model::PushObject(ObjectPtr object)
 {
 	m_objects.push_back(std::move(object));
-	return *m_objects.back();
+}
+
+ObjectPtr GMT::Model::Model::PopObject()
+{
+	ObjectPtr object = std::move(m_objects.back());
+	m_objects.pop_back();
+	return object;
 }

@@ -4,8 +4,12 @@
 #include "../MainView.h"
 #include "../RenderContext.h"
 
+#include "../Model/Command/AddObject.h"
+#include "../Model/Command/AddWall.h" 
 #include "../Model/Model.h"
 
+#include "Jig/EdgeMeshAddFace.h"
+#include "Jig/EdgeMeshCommand.h"
 #include "Jig/PolyLine.h"
 
 #include "libKernel/MinFinder.h"
@@ -157,6 +161,16 @@ VectorTool::OverState VectorTool::HitTest(const sf::Vector2f& logPoint, const Mo
 	return result;
 }
 
+bool VectorTool::AddWall(const Jig::PolyLine& polyline, const Terminus& start, const Terminus& end)
+{
+	auto command = std::make_unique<Model::Command::AddWall>(start, end, polyline, *m_objectEdit->object);
+	if (!command->CanDo())
+		return false;
+
+	App::GetCommandStack().AddCommand(std::move(command));
+	return true;
+}
+
 void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & point)
 {
 	if (m_overState.snap == Snap::None)
@@ -180,7 +194,7 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 			for (auto& point : m_points)
 				poly.push_back(Jig::Vec2(point));
 
-			const_cast<Model::VectorObject*>(m_objectEdit->object)->AddWall(poly, m_objectEdit->start, m_overState.terminus);
+			AddWall(poly, m_objectEdit->start, m_overState.terminus);
 			
 			m_points.clear();
 			m_objectEdit = nullptr;
@@ -189,7 +203,7 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 	else if (IsClosed())
 	{
 		auto object = std::make_unique<Model::VectorObject>(m_points);
-		App::GetModel().AddObject(std::move(object));
+		App::GetCommandStack().AddCommand(std::make_unique<Model::Command::AddObject>(std::move(object)));
 		finished = true;
 		m_points.clear();
 	}

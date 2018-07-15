@@ -1,7 +1,6 @@
 #include "VectorObject.h"
 #include "../Grid.h"
 
-#include "Jig/EdgeMeshAddFace.h"
 #include "Jig/EdgeMeshInternalEdges.h"
 #include "Jig/Geometry.h"
 #include "Jig/Mitre.h"
@@ -71,35 +70,6 @@ void VectorObject::Draw(RenderContext& rc) const
 	rc.GetWindow().draw(m_walls, renderStates);
 }
 
-bool VectorObject::AddWall(const Jig::PolyLine& polyline, const Terminus& start, const Terminus& end)
-{
-	auto getVert = [&](const Terminus& term)
-	{
-		const Jig::EdgeMesh::Vert* result{};
-
-		if (auto* vertTerm = term.GetVert())
-		{
-			result = *vertTerm;
-		}
-		else if (auto* edgeTerm = term.GetEdge())
-		{
-			auto& newEdge = m_edgeMesh->InsertVert(edgeTerm->second, *const_cast<Jig::EdgeMesh::Edge*>(edgeTerm->first));
-			result = newEdge.vert;
-		}
-			
-		return const_cast<Jig::EdgeMesh::Vert*>(result);
-	};
-	
-	Jig::EdgeMesh::Vert* startVert = getVert(start);
-	Jig::EdgeMesh::Vert* endVert = getVert(end);
-
-	if (!Jig::EdgeMeshAddFace(*m_edgeMesh, *startVert, *endVert, polyline))
-		return false;
-
-	Update();
-	return true;
-}
-
 VectorObject::TriangleMeshPtr VectorObject::MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const
 {
 	TriangleMeshPtr mesh = std::make_unique<TriangleMesh>();
@@ -143,12 +113,12 @@ bool VectorObject::Init(std::vector<sf::Vector2f> points)
 	for (const auto& vert : m_edgeMesh->GetVerts())
 		face->AddAndConnectEdge(vert.get());
 
-	m_edgeMesh->AddFace(std::move(face));
+	m_edgeMesh->PushFace(std::move(face));
 
 	return true;
 }
 
-void VectorObject::Update()
+void VectorObject::Update() const
 {
 	m_edgeMesh->Update();
 	m_edgeMesh->Dump();
@@ -157,7 +127,7 @@ void VectorObject::Update()
 	UpdateWalls();
 }
 
-void VectorObject::UpdateFloors()
+void VectorObject::UpdateFloors() const
 {
 	m_floors.clear();
 
@@ -175,7 +145,7 @@ void VectorObject::UpdateFloors()
 	}
 }
 
-void VectorObject::UpdateWalls()
+void VectorObject::UpdateWalls() const
 {
 	m_walls.clear();
 
@@ -190,7 +160,7 @@ void VectorObject::UpdateWalls()
 	}
 }
 
-void VectorObject::UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment alignment)
+void VectorObject::UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment alignment) const
 {
 	Jig::PolyLine inner, outer;
 	inner.SetClosed(polyline.IsClosed());

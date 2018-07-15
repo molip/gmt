@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Model/CommandStack.h"
+
 #include "libraries/libKernel/Singleton.h"
 
 #include <memory>
@@ -17,9 +19,11 @@ namespace GMT
 		App();
 		~App();
 
-		static Model::Model& GetModel() { return *Get()->m_model; }
+		static const Model::Model& GetModel() { return *Get()->m_model; }
+		static Model::CommandStack& GetCommandStack() { return *Get()->m_commandStack; }
 
 	private:
 		std::unique_ptr<Model::Model> m_model;
+		std::unique_ptr<Model::CommandStack> m_commandStack;
 	};
 }

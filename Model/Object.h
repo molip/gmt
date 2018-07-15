@@ -13,5 +13,6 @@ namespace GMT::Model
 		virtual ~Object();
 
 		virtual void Draw(RenderContext& rc) const = 0;
+		virtual void Update() const {}
 	};
 }

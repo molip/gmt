@@ -46,6 +46,7 @@ namespace GMT::Tools
 		bool IsClosed() const;
 		void Update(const sf::Vector2f& logPoint);
 		OverState HitTest(const sf::Vector2f& logPoint, const Model::VectorObject* special) const;
+		bool AddWall(const Jig::PolyLine& polyline, const Terminus& start, const Terminus& end);
 
 		const MainView& m_view;
 		std::vector<sf::Vector2f> m_points;

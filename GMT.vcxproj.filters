@@ -26,6 +26,21 @@
       <Filter>Model</Filter>
     </ClCompile>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Model\CommandStack.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Command\AddObject.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Command\Base.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Command\EdgeMesh.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Command\AddWall.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -46,6 +61,21 @@
       <Filter>Model</Filter>
     </ClInclude>
     <ClInclude Include="App.h" />
+    <ClInclude Include="Model\CommandStack.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\Base.h">
+      <Filter>Model\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\AddObject.h">
+      <Filter>Model\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\EdgeMesh.h">
+      <Filter>Model\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\AddWall.h">
+      <Filter>Model\Command</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Model">
@@ -60,6 +90,9 @@
     </ClInclude>
     <Filter Include="Tools">
       <UniqueIdentifier>{f1f9e881-c55f-4863-92b3-55a5a01b02bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model\Command">
+      <UniqueIdentifier>{39a857c0-807c-4896-89a2-66b6722d2e22}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

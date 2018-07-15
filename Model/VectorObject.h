@@ -37,6 +37,7 @@ namespace GMT::Model
 		virtual void Load(const Kernel::Serial::LoadNode& node);
 
 		virtual void Draw(RenderContext& rc) const override;
+		virtual void Update() const override;
 
 		using VertTerminus = const Jig::EdgeMesh::Vert*;
 		using EdgeTerminus = std::pair<const Jig::EdgeMesh::Edge*, Jig::Vec2>;
@@ -59,7 +60,7 @@ namespace GMT::Model
 		Terminus HitTestEdges(const sf::Vector2f& point, float tolerance, float& distSquared) const;
 		const Jig::EdgeMesh::Face* HitTestRooms(const sf::Vector2f& point) const;
 
-		bool AddWall(const Jig::PolyLine& polyline, const Terminus& start, const Terminus& end);
+		Jig::EdgeMesh& GetMesh() { return *m_edgeMesh; }
 
 	private:
 		using WallPoints = std::optional<std::pair<Jig::Vec2f, Jig::Vec2f>>;
@@ -67,15 +68,14 @@ namespace GMT::Model
 		using TriangleMeshPtr = std::unique_ptr<TriangleMesh>;
 
 		bool Init(std::vector<sf::Vector2f> points);
-		void Update();
 
-		void UpdateFloors();
-		void UpdateWalls();
-		void UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment alignment);
+		void UpdateFloors() const;
+		void UpdateWalls() const;
+		void UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment alignment) const;
 
 		TriangleMeshPtr MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const;
 
-		sf::VertexArray	m_floors, m_walls;
+		mutable sf::VertexArray m_floors, m_walls;
 
 		std::unique_ptr<Jig::EdgeMesh> m_edgeMesh;
 		std::unique_ptr<sf::Texture> m_wallTexture, m_floorTexture;

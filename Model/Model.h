@@ -13,6 +13,7 @@ namespace GMT
 namespace GMT::Model
 {
 	class Object;
+	using ObjectPtr = std::unique_ptr<Object>;
 
 	class Model
 	{
@@ -20,7 +21,6 @@ namespace GMT::Model
 		using ObjectPtr = std::unique_ptr<Object>;
 		using Objects = std::vector<ObjectPtr>;
 		
-		Model();
 		~Model();
 
 		bool LoadFile();
@@ -32,7 +32,8 @@ namespace GMT::Model
 		void Draw(RenderContext& rc) const;
 
 		const Objects& GetObjects() const { return m_objects; }
-		Object& AddObject(ObjectPtr object);
+		void PushObject(ObjectPtr object);
+		ObjectPtr PopObject();
 
 	private:
 		std::vector<std::unique_ptr<Object>> m_objects;
