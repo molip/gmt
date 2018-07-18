@@ -30,23 +30,50 @@ AddWall::Verts AddWall::GetVerts() const
 {
 	auto compound = std::make_unique<Jig::EdgeMeshCommand::Compound>();
 
+	auto insertVert = [&](const VectorObject::EdgeTerminus& term)
+	{
+		auto command = std::make_unique<Jig::EdgeMeshCommand::InsertVert>(m_mesh, const_cast<Jig::EdgeMesh::Edge&>(*term.first), term.second);
+		auto* vert = command->GetVert();
+		compound->AddChild(std::move(command));
+		return vert;
+	};
+
+	auto* startEdgeTerm = m_start.GetEdge();
+	auto* endEdgeTerm = m_end.GetEdge();
+
+	if (startEdgeTerm && endEdgeTerm && startEdgeTerm->first == endEdgeTerm->first) // Same edge! 
+	{
+		Jig::EdgeMesh::Vert* startVert{};
+		Jig::EdgeMesh::Vert* endVert{};
+
+		// We have to do the one nearest the vert first. 
+		std::vector<std::pair<Jig::EdgeMesh::Vert**, const VectorObject::EdgeTerminus*>> vec;
+		vec = { { &startVert, startEdgeTerm },{ &endVert, endEdgeTerm } };
+
+		std::sort(vec.begin(), vec.end(), [&](auto& lhs, auto& rhs)
+		{
+			auto& lhsTerm = *lhs.second;
+			auto& rhsTerm = *rhs.second;
+			return Jig::Vec2(lhsTerm.second - *lhsTerm.first->vert).GetLengthSquared() < 
+				Jig::Vec2(rhsTerm.second - *rhsTerm.first->vert).GetLengthSquared();
+		});
+
+		for (auto&[vert, term] : vec)
+			*vert = insertVert(*term);
+
+		return { startVert, endVert, std::move(compound) };
+	}
+
 	auto getVert = [&](const Terminus& term)
 	{
-		const Jig::EdgeMesh::Vert* result{};
+		Jig::EdgeMesh::Vert* result{};
 
 		if (auto* vertTerm = term.GetVert())
-		{
-			result = *vertTerm;
-		}
+			result = const_cast<Jig::EdgeMesh::Vert*>(*vertTerm);
 		else if (auto* edgeTerm = term.GetEdge())
-		{
-			auto& edge = *const_cast<Jig::EdgeMesh::Edge*>(edgeTerm->first);
-			auto command = std::make_unique<Jig::EdgeMeshCommand::InsertVert>(m_mesh, edge, edgeTerm->second);
-			result = command->GetVert();
-			compound->AddChild(std::move(command));
-		}
+			result = insertVert(*edgeTerm);
 
-		return const_cast<Jig::EdgeMesh::Vert*>(result);
+		return result;
 	};
 
 	return { getVert(m_start), getVert(m_end), std::move(compound) };
