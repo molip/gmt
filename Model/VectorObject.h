@@ -55,6 +55,8 @@ namespace GMT::Model
 					return &edge->second;
 				return nullptr;
 			}
+
+			void Log(int indent) const;
 		};
 
 		Terminus HitTestEdges(const sf::Vector2f& point, float tolerance, float& distSquared) const;

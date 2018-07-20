@@ -12,6 +12,7 @@
 #include "Jig/EdgeMeshCommand.h"
 #include "Jig/PolyLine.h"
 
+#include "libKernel/Log.h"
 #include "libKernel/MinFinder.h"
 
 #include <SFML/Graphics.hpp>
@@ -167,12 +168,14 @@ bool VectorTool::AddWall(const Jig::PolyLine& polyline, const Terminus& start, c
 	if (!command->CanDo())
 		return false;
 
-	App::GetCommandStack().AddCommand(std::move(command));
+	App::AddCommand(std::move(command));
 	return true;
 }
 
 void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & point)
 {
+	Kernel::Log() << "VectorTool::OnMouseDown dev=" << point << " log=" << m_overState.gridPoint << " snap=" << (int)m_overState.snap << std::endl;
+
 	if (m_overState.snap == Snap::None)
 		return;
 
@@ -183,11 +186,19 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 		m_objectEdit = std::make_unique<ObjectEdit>();
 		m_objectEdit->object = m_overState.object;
 		m_objectEdit->start = m_overState.terminus;
+
+		Kernel::Log(1) << "Starting object edit" << std::endl;
+		Kernel::Log(1) << "Terminus:" << std::endl;
+		m_overState.terminus.Log(2);
 	}
 	else if (m_objectEdit)
 	{
 		if (finished = m_overState.snap == Snap::Edge || m_overState.snap == Snap::Vert)
 		{
+			Kernel::Log(1) << "Finishing object edit" << std::endl;
+			Kernel::Log(1) << "Terminus:" << std::endl;
+			m_overState.terminus.Log(2);
+
 			m_points.erase(m_points.begin());
 			
 			Jig::PolyLine poly;
@@ -202,8 +213,10 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 	}
 	else if (IsClosed())
 	{
+		Kernel::Log(1) << "Creating object with " << m_points.size() << " points" << std::endl;
+
 		auto object = std::make_unique<Model::VectorObject>(m_points);
-		App::GetCommandStack().AddCommand(std::make_unique<Model::Command::AddObject>(std::move(object)));
+		App::AddCommand(std::make_unique<Model::Command::AddObject>(std::move(object)));
 		finished = true;
 		m_points.clear();
 	}

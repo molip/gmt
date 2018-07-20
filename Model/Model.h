@@ -23,8 +23,8 @@ namespace GMT::Model
 		
 		~Model();
 
-		bool LoadFile();
-		void SaveFile() const;
+		bool LoadFile(const std::wstring& path);
+		bool SaveFile(const std::wstring& path) const;
 
 		void Load(const Kernel::Serial::LoadNode& node);
 		void Save(Kernel::Serial::SaveNode& node) const;

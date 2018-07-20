@@ -1,23 +1,24 @@
 #include "Model.h"
 #include "ImageObject.h"
 
+#include "libKernel/Log.h"
+
 using namespace GMT;
 using namespace GMT::Model;
 
 namespace Serial = Kernel::Serial;
 
-namespace
-{
-	const std::wstring TestPath = L"D:\\Users\\jxxwh\\Documents\\GMT\\Test.xml";
-	//const std::wstring TestPath = L"E:\\Users\\Jon\\Documents\\GMT\\Test.xml";
-}
-
 GMT::Model::Model::~Model() = default;
 
-bool GMT::Model::Model::LoadFile()
+bool GMT::Model::Model::LoadFile(const std::wstring& path)
 {
+	Kernel::Log() << "Loading model: " << path << std::endl;
 	Model model;
-	if (Kernel::Serial::LoadClass(TestPath, model))
+	
+	bool ok = Kernel::Serial::LoadClass(path, model);
+	Kernel::Log(1) << "Result: " << ok << std::endl;
+
+	if (ok)
 	{
 		m_objects = std::move(model.m_objects);
 		return true;
@@ -26,9 +27,12 @@ bool GMT::Model::Model::LoadFile()
 	return false;
 }
 
-void GMT::Model::Model::SaveFile() const
+bool GMT::Model::Model::SaveFile(const std::wstring& path) const
 {
-	Kernel::Serial::SaveClass(TestPath, *this);
+	Kernel::Log() << "Saving model: " << path << std::endl;
+	bool ok = Kernel::Serial::SaveClass(path, *this);
+	Kernel::Log(1) << "Result: " << ok << std::endl;
+	return ok;
 }
 
 void GMT::Model::Model::Load(const Kernel::Serial::LoadNode& node)

@@ -8,6 +8,7 @@
 #include "Jig/Triangulator.h"
 
 #include "libKernel/FormatString.h"
+#include "libKernel/Log.h"
 #include "libKernel/Math.h"
 #include "libKernel/MinFinder.h"
 
@@ -304,4 +305,14 @@ VectorObject::Terminus VectorObject::HitTestEdges(const sf::Vector2f& point, flo
 const Jig::EdgeMesh::Face* VectorObject::HitTestRooms(const sf::Vector2f& point) const
 {
 	return m_edgeMesh->HitTest(Jig::Vec2(point));
+}
+
+void VectorObject::Terminus::Log(int indent) const
+{
+	if (auto vert = GetVert())
+		Kernel::Log(indent) << "Vertex: pos=" << *vert << std::endl;
+	else if (auto edge = GetEdge())
+		Kernel::Log(indent) << "Edge: vertex pos=" << edge->second << std::endl;
+	else
+		Kernel::Log(indent) << "Null" << std::endl;
 }
