@@ -18,6 +18,8 @@ namespace GMT::Model
 	public:
 		explicit CommandStack(Model& model);
 		~CommandStack();
+		
+		void Clear();
 
 		void AddCommand(CommandPtr command, bool alreadyDone = false);
 		void Undo();

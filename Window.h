@@ -17,6 +17,8 @@ namespace GMT
 		Window(sf::WindowHandle handle);
 		virtual ~Window();
 
+		bool TryClose();
+
 		void Draw();
 
 		void PumpEvents();

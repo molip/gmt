@@ -110,10 +110,30 @@ void MainView::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point)
 
 void MainView::OnKeyPressed(const sf::Event::KeyEvent event) 
 {
-	if (event.code == sf::Keyboard::U && App::CanUndo())
-		App::Undo();
-	else if (event.code == sf::Keyboard::R && App::CanRedo())
-		App::Redo();
+	if (event.control && event.code == sf::Keyboard::Z)
+	{
+		if (event.shift)
+		{
+			if (App::CanRedo())
+				App::Redo();
+		}
+		else
+		{
+			if (App::CanUndo())
+				App::Undo();
+		}
+	}
+	else if (event.control && event.code == sf::Keyboard::S)
+	{
+		if (event.shift)
+			App::SaveAs();
+		else
+			App::Save();
+	}
+	else if (event.control && event.code == sf::Keyboard::O)
+		App::Load();
+	else if (event.control && event.code == sf::Keyboard::N)
+		App::New();
 	else
 		m_tool->OnKeyPressed(event);
 }

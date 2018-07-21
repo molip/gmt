@@ -9,6 +9,12 @@ CommandStack::CommandStack(Model& model) : m_model(model) {}
 
 CommandStack::~CommandStack() = default;
 
+void CommandStack::Clear()
+{
+	m_index = 0;
+	m_commands.clear();
+}
+
 void CommandStack::AddCommand(CommandPtr command, bool alreadyDone)
 {
 	if (!alreadyDone)

@@ -23,6 +23,8 @@ namespace GMT::Model
 		
 		~Model();
 
+		void Clear() { m_objects.clear(); }
+
 		bool LoadFile(const std::wstring& path);
 		bool SaveFile(const std::wstring& path) const;
 

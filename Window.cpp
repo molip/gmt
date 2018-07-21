@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "App.h"
 #include "MainView.h"
 
 #include "SFML/Graphics.hpp"
@@ -19,8 +20,19 @@ Window::Window(sf::WindowHandle handle) : sf::RenderWindow(handle)
 
 Window::~Window() = default;
 
+bool Window::TryClose()
+{
+	if (!App::PreClose())
+		return false;
+
+	close();
+	return true;
+}
+
 void Window::Init()
 {
+	App::SetMainWindow(this);
+
 	m_mainView = std::make_unique<MainView>();
 	m_views.push_back(m_mainView.get());
 }
