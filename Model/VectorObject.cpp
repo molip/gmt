@@ -140,9 +140,13 @@ void VectorObject::UpdateFloors() const
 	for (auto& face : m_edgeMesh->GetFaces())
 	{
 		auto poly = face->GetPolygon();
-		const auto mesh = MakeTriangleMesh(Jig::Triangulator(poly).Go());
-		for (auto& point : *mesh)
-			m_floors.append(sf::Vertex(point, { point.x * texSize.x * FloorTextureScale, point.y * texSize.y * FloorTextureScale }));
+		poly.Update();
+		if (!poly.IsSelfIntersecting())
+		{
+			const auto mesh = MakeTriangleMesh(Jig::Triangulator(poly).Go());
+			for (auto& point : *mesh)
+				m_floors.append(sf::Vertex(point, { point.x * texSize.x * FloorTextureScale, point.y * texSize.y * FloorTextureScale }));
+		}
 	}
 }
 
@@ -195,10 +199,7 @@ void VectorObject::UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment
 	outer.Update();
 
 	if (inner.IsSelfIntersecting() || outer.IsSelfIntersecting())
-	{
-		KERNEL_ASSERT(false);
 		return;
-	}
 
 	for (int i = 0; i < outer.GetSegmentCount(); ++i)
 	{
@@ -215,7 +216,12 @@ void VectorObject::UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment
 		const float innerLength = innerVec.GetLength();
 		const float edgeLength = edgeVec.GetLength();
 
-		const float cos = outerVec.Normalised().Dot(edgeVec.Normalised());
+		Jig::Vec2f outerVecNorm = outerVec;
+		Jig::Vec2f edgeVecNorm = edgeVec;
+		if (!outerVecNorm.Normalise() || !edgeVecNorm.Normalise())
+			return;
+
+		const float cos = outerVecNorm.Dot(edgeVecNorm);
 
 		const float innerOffset = cos * edgeLength;
 
