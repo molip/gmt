@@ -16,6 +16,7 @@ namespace GMT::Tools
 		virtual void Draw(RenderContext& rc) const = 0;
 		virtual void OnMouseMoved(const sf::Vector2i& point) {};
 		virtual void OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point) {}
+		virtual void OnMouseUp(sf::Mouse::Button button, const sf::Vector2i& point) {}
 		virtual void OnKeyPressed(const sf::Event::KeyEvent event) {}
 	};
 }

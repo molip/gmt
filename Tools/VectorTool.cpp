@@ -22,7 +22,6 @@ using namespace GMT::Tools;
 
 namespace
 {
-	const int SnappingDistance = 100; // Device.
 	const float BigDotRadius = 10; // Logical.
 	const float SmallDotRadius = 5; // Logical.
 }

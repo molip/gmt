@@ -5,6 +5,7 @@
 #include "Model/VectorObject.h"
 #include "Model/Model.h"
 
+#include "Tools/SelectTool.h"
 #include "Tools/VectorTool.h"
 
 #include "SFML/Graphics.hpp"
@@ -21,7 +22,7 @@ namespace
 
 MainView::MainView() : m_grid(LogWidth, LogHeight, GridSize)
 {
-	m_tool = std::make_unique<Tools::VectorTool>(*this);
+	m_tool = std::make_unique<Tools::SelectTool>(*this);
 }
 
 MainView::~MainView() = default;
@@ -106,6 +107,11 @@ void MainView::OnMouseMoved(const sf::Vector2i& point)
 void MainView::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point)
 {
 	m_tool->OnMouseDown(button, point);
+}
+
+void MainView::OnMouseUp(sf::Mouse::Button button, const sf::Vector2i& point)
+{
+	m_tool->OnMouseUp(button, point);
 }
 
 void MainView::OnKeyPressed(const sf::Event::KeyEvent event) 

@@ -21,6 +21,7 @@ namespace GMT::Model
 		
 		void Clear();
 
+		void DoCommand(Command::Base& command);
 		void AddCommand(CommandPtr command, bool alreadyDone = false);
 		void Undo();
 		void Redo();

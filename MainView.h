@@ -16,7 +16,6 @@ namespace GMT
 	namespace Tools
 	{
 		class Tool;
-		class VectorTool;
 	}
 
 	class MainView : public View
@@ -35,11 +34,12 @@ namespace GMT
 		virtual sf::FloatRect GetClipRect() const override;
 		virtual void OnMouseMoved(const sf::Vector2i& point) override;
 		virtual void OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point) override;
+		virtual void OnMouseUp(sf::Mouse::Button button, const sf::Vector2i& point) override;
 		virtual void OnKeyPressed(const sf::Event::KeyEvent event) override;
 
 		Grid m_grid;
 		std::vector<std::unique_ptr<Model::Object>> m_objects;
-		std::unique_ptr<Tools::VectorTool> m_tool;
+		std::unique_ptr<Tools::Tool> m_tool;
 	};
 }
 

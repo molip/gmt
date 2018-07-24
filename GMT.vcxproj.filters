@@ -41,6 +41,9 @@
     <ClCompile Include="Model\Command\AddWall.cpp">
       <Filter>Model\Command</Filter>
     </ClCompile>
+    <ClCompile Include="Tools\SelectTool.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -75,6 +78,9 @@
     </ClInclude>
     <ClInclude Include="Model\Command\AddWall.h">
       <Filter>Model\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\SelectTool.h">
+      <Filter>Tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

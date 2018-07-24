@@ -32,6 +32,11 @@ void EdgeMesh::Undo(Model& model)
 	m_object.Update();
 }
 
+void EdgeMesh::UndoNoUpdate()
+{
+	m_command->Undo();
+}
+
 void EdgeMesh::Redo(Model& model) // In case Do is overridden.
 {
 	m_command->Do();

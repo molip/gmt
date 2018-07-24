@@ -20,6 +20,8 @@ namespace GMT::Model::Command
 		virtual void Undo(Model& model) override;
 		virtual void Redo(Model& model) override;
 
+		void UndoNoUpdate();
+
 	protected:
 		Ptr m_command;
 		const Object& m_object;

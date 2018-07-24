@@ -53,6 +53,11 @@ void GMT::App::DoAutoSave()
 	KERNEL_ASSERT(ok);
 }
 
+void GMT::App::DoCommand(Model::Command::Base& command)
+{
+	Get()->m_commandStack->DoCommand(command);
+}
+
 void GMT::App::AddCommand(Model::CommandPtr command, bool alreadyDone)
 {
 	Get()->m_commandStack->AddCommand(std::move(command), alreadyDone);

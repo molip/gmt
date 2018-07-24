@@ -38,6 +38,7 @@ namespace GMT
 		static const Model::Model& GetModel() { return *Get()->m_model; }
 		static void DoAutoSave();
 
+		static void DoCommand(Model::Command::Base& command);
 		static void AddCommand(Model::CommandPtr command, bool alreadyDone = false);
 		static void Undo();
 		static void Redo();

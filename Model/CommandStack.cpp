@@ -15,6 +15,11 @@ void CommandStack::Clear()
 	m_commands.clear();
 }
 
+void CommandStack::DoCommand(Command::Base& command)
+{
+	command.Do(m_model);
+}
+
 void CommandStack::AddCommand(CommandPtr command, bool alreadyDone)
 {
 	if (!alreadyDone)

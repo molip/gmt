@@ -97,6 +97,7 @@
     <ClCompile Include="Model\Object.cpp" />
     <ClCompile Include="Model\VectorObject.cpp" />
     <ClCompile Include="RenderContext.cpp" />
+    <ClCompile Include="Tools\SelectTool.cpp" />
     <ClCompile Include="Tools\Tool.cpp" />
     <ClCompile Include="Tools\VectorTool.cpp" />
     <ClCompile Include="View.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="Model\Object.h" />
     <ClInclude Include="Model\VectorObject.h" />
     <ClInclude Include="RenderContext.h" />
+    <ClInclude Include="Tools\SelectTool.h" />
     <ClInclude Include="Tools\Tool.h" />
     <ClInclude Include="Tools\VectorTool.h" />
     <ClInclude Include="View.h" />
