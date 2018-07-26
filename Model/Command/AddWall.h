@@ -28,8 +28,7 @@ namespace GMT::Model::Command
 			
 		const Terminus m_start, m_end;
 		Jig::PolyLine m_points;
-		Jig::EdgeMesh& m_mesh;
-		
+
 		NewVertVec m_newVerts;
 	};
 }

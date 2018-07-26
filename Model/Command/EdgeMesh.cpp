@@ -1,23 +1,28 @@
 #include "EdgeMesh.h"
 #include "../Model.h"
-#include "../Object.h"
+#include "../VectorObject.h"
 
 #include "Jig/EdgeMeshCommand.h"
 
 using namespace GMT::Model;
 using namespace GMT::Model::Command;
 
-EdgeMesh::EdgeMesh(const Object& object) : m_object(object)
+EdgeMesh::EdgeMesh(const VectorObject& object) : m_object(object)
 {
 }
 
-EdgeMesh::EdgeMesh(Ptr command, const Object& object) : m_command(std::move(command)), m_object(object)
+EdgeMesh::EdgeMesh(Ptr command, const VectorObject& object) : m_command(std::move(command)), m_object(object)
 {
 }
 
-EdgeMesh::EdgeMesh(Jig::EdgeMeshCommand::Compound::Vec&& commands, const Object& object) : m_object(object)
+EdgeMesh::EdgeMesh(Jig::EdgeMeshCommand::Compound::Vec&& commands, const VectorObject& object) : m_object(object)
 {
 	m_command = std::make_unique<Jig::EdgeMeshCommand::Compound>(std::move(commands));
+}
+
+Jig::EdgeMesh& EdgeMesh::GetMesh() const
+{
+	return const_cast<VectorObject&>(m_object).GetMesh();
 }
 
 void EdgeMesh::Do(CommandContext& ctx)

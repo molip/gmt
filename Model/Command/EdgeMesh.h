@@ -4,7 +4,7 @@
 
 #include "Jig/EdgeMeshCommand.h"
 
-namespace GMT::Model { class Object; }
+namespace GMT::Model { class VectorObject; }
 
 namespace GMT::Model::Command
 {
@@ -12,9 +12,9 @@ namespace GMT::Model::Command
 	{
 	public:
 		using Ptr = std::unique_ptr<Jig::EdgeMeshCommand::Base>;
-		EdgeMesh(const Object& object);
-		EdgeMesh(Ptr command, const Object& object);
-		EdgeMesh(Jig::EdgeMeshCommand::Compound::Vec&& commands, const Object& object);
+		EdgeMesh(const VectorObject& object);
+		EdgeMesh(Ptr command, const VectorObject& object);
+		EdgeMesh(Jig::EdgeMeshCommand::Compound::Vec&& commands, const VectorObject& object);
 
 		virtual void Do(CommandContext& ctx) override;
 		virtual void Undo(CommandContext& ctx) override;
@@ -23,7 +23,9 @@ namespace GMT::Model::Command
 		void UndoNoUpdate();
 
 	protected:
+		Jig::EdgeMesh& GetMesh() const;
+			
 		Ptr m_command;
-		const Object& m_object;
+		const VectorObject& m_object;
 	};
 }
