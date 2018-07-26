@@ -63,6 +63,7 @@ namespace GMT::Model
 		const Jig::EdgeMesh::Face* HitTestRooms(const sf::Vector2f& point) const;
 
 		Jig::EdgeMesh& GetMesh() { return *m_edgeMesh; }
+		const Jig::EdgeMesh& GetMesh() const { return *m_edgeMesh; }
 
 	private:
 		using WallPoints = std::optional<std::pair<Jig::Vec2f, Jig::Vec2f>>;

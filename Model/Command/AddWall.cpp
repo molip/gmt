@@ -1,5 +1,6 @@
 #include "AddWall.h"
 #include "../Model.h"
+#include "../Selection.h"
 
 #include "Jig/EdgeMeshCommand.h"
 #include "Jig/EdgeMeshAddFace.h"
@@ -12,21 +13,34 @@ AddWall::AddWall(const Terminus& start, const Terminus& end, const Jig::PolyLine
 {
 }
 
-void AddWall::Do(Model& model)
+void AddWall::Do(CommandContext& ctx)
 {
 	// We have to add any new verts before calling EdgeMeshAddFace.
-	auto[start, end, compound] = GetVerts();
+	auto[start, end, compound] = GetVerts(&m_newVerts);
 	compound->Do();
 
 	auto& faceCommand = Jig::EdgeMeshAddFace(m_mesh, *start, *end, m_points);
+
+	for (auto& vert : faceCommand->GetNewVerts())
+		m_newVerts.push_back(vert.get());
+
 	faceCommand->Do();
+
 	compound->AddChild(std::move(faceCommand));
 
 	m_command = std::move(compound);
 	m_object.Update();
 }
 
-AddWall::Verts AddWall::GetVerts() const
+void GMT::Model::Command::AddWall::Undo(CommandContext & ctx)
+{
+	__super::Undo(ctx);
+	
+	for (auto& vert : m_newVerts)
+		ctx.Deselect(Selection(*vert));
+}
+
+AddWall::Verts AddWall::GetVerts(NewVertVec* newVerts) const
 {
 	auto compound = std::make_unique<Jig::EdgeMeshCommand::Compound>();
 
@@ -34,6 +48,9 @@ AddWall::Verts AddWall::GetVerts() const
 	{
 		auto command = std::make_unique<Jig::EdgeMeshCommand::InsertVert>(m_mesh, const_cast<Jig::EdgeMesh::Edge&>(*term.first), term.second);
 		auto* vert = command->GetVert();
+		if (newVerts)
+			newVerts->push_back(vert);
+
 		compound->AddChild(std::move(command));
 		return vert;
 	};
@@ -81,7 +98,7 @@ AddWall::Verts AddWall::GetVerts() const
 
 bool GMT::Model::Command::AddWall::CanDo() const
 {
-	auto[start, end, compound] = GetVerts();
+	auto[start, end, compound] = GetVerts(nullptr);
 	compound->Do();
 	
 	bool ok = Jig::EdgeMeshAddFace(m_mesh, *start, *end, m_points) != nullptr;

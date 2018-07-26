@@ -15,8 +15,8 @@ namespace GMT::Model::Command
 	public:
 		AddObject(ObjectPtr object);
 
-		virtual void Do(Model& model) override;
-		virtual void Undo(Model& model) override;
+		virtual void Do(CommandContext& ctx) override;
+		virtual void Undo(CommandContext& ctx) override;
 
 	private:
 		ObjectPtr m_object;

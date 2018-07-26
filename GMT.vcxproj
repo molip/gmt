@@ -94,7 +94,9 @@
     <ClCompile Include="Model\Command\EdgeMesh.cpp" />
     <ClCompile Include="Model\ImageObject.cpp" />
     <ClCompile Include="Model\Model.cpp" />
+    <ClCompile Include="Model\Notification.cpp" />
     <ClCompile Include="Model\Object.cpp" />
+    <ClCompile Include="Model\Selection.cpp" />
     <ClCompile Include="Model\VectorObject.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="Tools\SelectTool.cpp" />
@@ -115,7 +117,9 @@
     <ClInclude Include="Model\Command\EdgeMesh.h" />
     <ClInclude Include="Model\ImageObject.h" />
     <ClInclude Include="Model\Model.h" />
+    <ClInclude Include="Model\Notification.h" />
     <ClInclude Include="Model\Object.h" />
+    <ClInclude Include="Model\Selection.h" />
     <ClInclude Include="Model\VectorObject.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="Tools\SelectTool.h" />

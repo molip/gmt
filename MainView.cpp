@@ -140,6 +140,10 @@ void MainView::OnKeyPressed(const sf::Event::KeyEvent event)
 		App::Load();
 	else if (event.control && event.code == sf::Keyboard::N)
 		App::New();
+	else if (event.code == sf::Keyboard::F1)
+		m_tool = std::make_unique<Tools::SelectTool>(*this);
+	else if (event.code == sf::Keyboard::F2)
+		m_tool = std::make_unique<Tools::VectorTool>(*this);
 	else
 		m_tool->OnKeyPressed(event);
 }

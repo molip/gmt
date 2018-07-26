@@ -6,6 +6,7 @@
 
 #include "../Model/Command/EdgeMesh.h" 
 #include "../Model/Model.h"
+#include "../Model/Selection.h"
 
 #include "Jig/EdgeMeshCommand.h"
 #include "Jig/PolyLine.h"
@@ -30,7 +31,7 @@ SelectTool::SelectTool(const MainView& view) : m_view(view)
 
 void SelectTool::Draw(RenderContext& rc) const
 {
-	auto drawCircle = [&](auto& gridPoint, float radius, auto& colour, bool outline = false)
+	auto drawCircle = [&](sf::Vector2f& gridPoint, float radius, auto& colour, bool outline = false)
 	{
 		sf::CircleShape circle(radius);
 		circle.setFillColor(outline ? sf::Color::Transparent : colour);
@@ -43,11 +44,10 @@ void SelectTool::Draw(RenderContext& rc) const
 		rc.GetWindow().draw(circle);
 	};
 
-	if (m_dragging)
-	{
-		drawCircle(m_gridPoint, BigDotRadius, sf::Color::Yellow, true);
-	}
-	else
+	if (auto* selectedVert = App::GetSelection().GetVert())
+		drawCircle(sf::Vector2f(*selectedVert), BigDotRadius, sf::Color::Yellow, true);
+
+	if (!m_dragging)
 	{
 		for (auto& object : App::GetModel().GetObjects())
 			if (Model::VectorObject* vectorObject = dynamic_cast<Model::VectorObject*>(object.get()))
@@ -105,6 +105,15 @@ void SelectTool::Update(const sf::Vector2f& logPoint)
 void SelectTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & point)
 {
 	Kernel::Log() << "SelectTool::OnMouseDown dev=" << point << std::endl;
+
+	if (m_overState.vert != App::GetSelection().GetVert())
+	{
+		Model::Selection selection;
+		if (m_overState.vert)
+			selection.SetVert(*m_overState.vert);
+
+		App::SetSelection(selection);
+	}
 
 	m_dragging = m_overState.vert;
 }

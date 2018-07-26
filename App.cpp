@@ -3,7 +3,9 @@
 #include "Model/Command/Base.h"
 #include "Model/CommandStack.h"
 #include "Model/Model.h"
-#include "Model/ImageObject.h"
+#include "Model/Notification.h"
+#include "Model/Object.h"
+#include "Model/Selection.h"
 	  
 #include "libKernel/FileDialog.h"
 #include "libKernel/Filesystem.h"
@@ -35,6 +37,7 @@ GMT::App::App()
 	KERNEL_VERIFY(Kernel::FileSystem::CreateDir(m_rootPath + ::AutosavePath));
 
 	m_model = std::make_unique<Model::Model>();
+	m_selection = std::make_unique<Model::Selection>();
 	m_commandStack = std::make_unique<Model::CommandStack>(*m_model);
 }
 
@@ -53,29 +56,45 @@ void GMT::App::DoAutoSave()
 	KERNEL_ASSERT(ok);
 }
 
-void GMT::App::DoCommand(Model::Command::Base& command)
+void GMT::App::SetSelection(const Model::Selection& selection)
 {
-	Get()->m_commandStack->DoCommand(command);
+	*Get()->m_selection = selection;
+	Get()->Notify(Model::Notification::SelectionChanged());
+}
+
+void GMT::App::ClearSelection()
+{
+	SetSelection(Model::Selection());
 }
 
 void GMT::App::AddCommand(Model::CommandPtr command, bool alreadyDone)
 {
-	Get()->m_commandStack->AddCommand(std::move(command), alreadyDone);
-	Get()->m_isModelDirty = true;
+	Get()->_AddCommand(std::move(command), alreadyDone);
+}
+
+void GMT::App::_DoCommand(Model::Command::Base& command)
+{
+	UpdateSelection(m_commandStack->DoCommand(command, *m_selection));
+}
+
+void GMT::App::_AddCommand(Model::CommandPtr command, bool alreadyDone)
+{
+	UpdateSelection(m_commandStack->AddCommand(std::move(command), *m_selection, alreadyDone));
+	m_isModelDirty = true;
 	DoAutoSave();
 }
 
-void GMT::App::Undo()
+void GMT::App::_Undo()
 {
-	Get()->m_commandStack->Undo();
-	Get()->m_isModelDirty = true;
+	UpdateSelection(m_commandStack->Undo(*m_selection));
+	m_isModelDirty = true;
 	DoAutoSave();
 }
 
-void GMT::App::Redo()
+void GMT::App::_Redo()
 {
-	Get()->m_commandStack->Redo();
-	Get()->m_isModelDirty = true;
+	UpdateSelection(m_commandStack->Redo(*m_selection));
+	m_isModelDirty = true;
 	DoAutoSave();
 }
 
@@ -126,6 +145,16 @@ void* GMT::App::GetMainWindowHandle() const
 	return m_mainWindow->getSystemHandle();
 }
 
+void GMT::App::Notify(const Model::Notification::Base& notification)
+{
+}
+
+void GMT::App::UpdateSelection(Model::SelectionPtr selection)
+{
+	if (selection)
+		SetSelection(*selection);
+}
+
 bool GMT::App::_New()
 {
 	if (!PreDiscardModel())
@@ -135,6 +164,7 @@ bool GMT::App::_New()
 	m_commandStack->Clear();
 	m_modelPath.clear();
 	m_isModelDirty = false;
+	ClearSelection();
 	return true;
 }
 
@@ -188,5 +218,6 @@ bool GMT::App::_Load()
 	m_commandStack->Clear();
 	m_modelPath = path;
 	m_isModelDirty = false;
+	ClearSelection();
 	return true;
 }

@@ -20,13 +20,13 @@ EdgeMesh::EdgeMesh(Jig::EdgeMeshCommand::Compound::Vec&& commands, const Object&
 	m_command = std::make_unique<Jig::EdgeMeshCommand::Compound>(std::move(commands));
 }
 
-void EdgeMesh::Do(Model& model)
+void EdgeMesh::Do(CommandContext& ctx)
 {
 	m_command->Do();
 	m_object.Update();
 }
 
-void EdgeMesh::Undo(Model& model)
+void EdgeMesh::Undo(CommandContext& ctx)
 {
 	m_command->Undo();
 	m_object.Update();
@@ -37,7 +37,7 @@ void EdgeMesh::UndoNoUpdate()
 	m_command->Undo();
 }
 
-void EdgeMesh::Redo(Model& model) // In case Do is overridden.
+void EdgeMesh::Redo(CommandContext& ctx) // In case Do is overridden.
 {
 	m_command->Do();
 	m_object.Update();

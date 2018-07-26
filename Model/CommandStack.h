@@ -9,22 +9,29 @@ namespace GMT::Model
 	{
 		class Base;
 	}
-	
+
+	namespace Notification
+	{
+		class Base;
+	}
+
 	class Model;
+	class Selection;
 	using CommandPtr = std::unique_ptr<Command::Base>;
+	using SelectionPtr = std::unique_ptr<Selection>;
 
 	class CommandStack
 	{
 	public:
-		explicit CommandStack(Model& model);
+		CommandStack(Model& model);
 		~CommandStack();
 		
 		void Clear();
 
-		void DoCommand(Command::Base& command);
-		void AddCommand(CommandPtr command, bool alreadyDone = false);
-		void Undo();
-		void Redo();
+		SelectionPtr DoCommand(Command::Base& command, const Selection& selection);
+		SelectionPtr AddCommand(CommandPtr command, const Selection& selection, bool alreadyDone = false);
+		SelectionPtr Undo(const Selection& selection);
+		SelectionPtr Redo(const Selection& selection);
 	
 		bool CanUndo() const;
 		bool CanRedo() const;

@@ -44,6 +44,12 @@
     <ClCompile Include="Tools\SelectTool.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
+    <ClCompile Include="Model\Selection.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Notification.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -81,6 +87,12 @@
     </ClInclude>
     <ClInclude Include="Tools\SelectTool.h">
       <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Selection.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Notification.h">
+      <Filter>Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

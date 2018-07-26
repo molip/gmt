@@ -16,9 +16,9 @@ namespace GMT::Model::Command
 		EdgeMesh(Ptr command, const Object& object);
 		EdgeMesh(Jig::EdgeMeshCommand::Compound::Vec&& commands, const Object& object);
 
-		virtual void Do(Model& model) override;
-		virtual void Undo(Model& model) override;
-		virtual void Redo(Model& model) override;
+		virtual void Do(CommandContext& ctx) override;
+		virtual void Undo(CommandContext& ctx) override;
+		virtual void Redo(CommandContext& ctx) override;
 
 		void UndoNoUpdate();
 
