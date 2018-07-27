@@ -89,6 +89,7 @@
     <ClCompile Include="MainView.cpp" />
     <ClCompile Include="Model\CommandStack.cpp" />
     <ClCompile Include="Model\Command\AddObject.cpp" />
+    <ClCompile Include="Model\Command\AddVert.cpp" />
     <ClCompile Include="Model\Command\AddWall.cpp" />
     <ClCompile Include="Model\Command\Base.cpp" />
     <ClCompile Include="Model\Command\EdgeMesh.cpp" />
@@ -99,6 +100,7 @@
     <ClCompile Include="Model\Selection.cpp" />
     <ClCompile Include="Model\VectorObject.cpp" />
     <ClCompile Include="RenderContext.cpp" />
+    <ClCompile Include="Tools\AddVertTool.cpp" />
     <ClCompile Include="Tools\SelectTool.cpp" />
     <ClCompile Include="Tools\Tool.cpp" />
     <ClCompile Include="Tools\VectorTool.cpp" />
@@ -112,6 +114,7 @@
     <ClInclude Include="MainView.h" />
     <ClInclude Include="Model\CommandStack.h" />
     <ClInclude Include="Model\Command\AddObject.h" />
+    <ClInclude Include="Model\Command\AddVert.h" />
     <ClInclude Include="Model\Command\AddWall.h" />
     <ClInclude Include="Model\Command\Base.h" />
     <ClInclude Include="Model\Command\EdgeMesh.h" />
@@ -122,6 +125,7 @@
     <ClInclude Include="Model\Selection.h" />
     <ClInclude Include="Model\VectorObject.h" />
     <ClInclude Include="RenderContext.h" />
+    <ClInclude Include="Tools\AddVertTool.h" />
     <ClInclude Include="Tools\SelectTool.h" />
     <ClInclude Include="Tools\Tool.h" />
     <ClInclude Include="Tools\VectorTool.h" />
