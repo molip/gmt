@@ -26,6 +26,30 @@ namespace
 
 REGISTER_DYNAMIC(VectorObject)
 
+std::unique_ptr<VectorObject> VectorObject::Create(std::vector<sf::Vector2f> points)
+{
+	if (points.empty())
+		return nullptr;
+
+	// Polygon::Update() doesn't like duplicate adjacent points.
+	points.erase(std::unique(points.begin(), points.end()), points.end());
+
+	if (points.size() < 3)
+		return nullptr;
+
+	Jig::Polygon poly;
+	poly.reserve(points.size());
+
+	for (const auto& point : points)
+		poly.push_back({ (double)point.x, (double)point.y });
+
+	poly.Update();
+	if (poly.IsSelfIntersecting())
+		return nullptr;
+
+	return std::unique_ptr<VectorObject>(new VectorObject(poly));
+}
+
 VectorObject::VectorObject()
 {
 	m_wallTexture = std::make_unique<sf::Texture>();
@@ -40,9 +64,20 @@ VectorObject::VectorObject()
 	m_walls.setPrimitiveType(sf::Triangles);
 }
 
-VectorObject::VectorObject(const std::vector<sf::Vector2f>& points) : VectorObject()
+VectorObject::VectorObject(const Jig::Polygon& poly) : VectorObject()
 {
-	Init(points);
+	std::vector<Jig::EdgeMesh::VertPtr> verts;
+	verts.reserve(poly.size());
+	for (const auto& point : poly)
+		verts.push_back(std::make_unique<Jig::EdgeMesh::Vert>(point));
+
+	m_edgeMesh = std::make_unique<Jig::EdgeMesh>(std::move(verts));
+
+	auto face = std::make_unique<Jig::EdgeMesh::Face>();
+	for (const auto& vert : m_edgeMesh->GetVerts())
+		face->AddAndConnectEdge(vert.get());
+
+	m_edgeMesh->PushFace(std::move(face));
 
 	Update();
 }
@@ -80,43 +115,6 @@ VectorObject::TriangleMeshPtr VectorObject::MakeTriangleMesh(const Jig::EdgeMesh
 			mesh->push_back({ (float)point.x, (float)point.y });
 
 	return mesh;
-}
-
-bool VectorObject::Init(std::vector<sf::Vector2f> points)
-{
-	if (points.empty())
-		return false;
-
-	// Polygon::Update() doesn't like duplicate adjacent points.
-	points.erase(std::unique(points.begin(), points.end()), points.end());
-
-	if (points.size() < 3)
-		return false;
-
-	Jig::Polygon poly;
-	poly.reserve(points.size());
-
-	for (const auto& point : points)
-		poly.push_back({ (double)point.x, (double)point.y });
-
-	poly.Update();
-	if (poly.IsSelfIntersecting())
-		return false;
-
-	std::vector<Jig::EdgeMesh::VertPtr> verts;
-	verts.reserve(poly.size());
-	for (const auto& point : poly)
-		verts.push_back(std::make_unique<Jig::EdgeMesh::Vert>(point));
-
-	m_edgeMesh = std::make_unique<Jig::EdgeMesh>(std::move(verts));
-
-	auto face = std::make_unique<Jig::EdgeMesh::Face>();
-	for (const auto& vert : m_edgeMesh->GetVerts())
-		face->AddAndConnectEdge(vert.get());
-
-	m_edgeMesh->PushFace(std::move(face));
-
-	return true;
 }
 
 void VectorObject::Update() const

@@ -212,12 +212,14 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 	}
 	else if (IsClosed())
 	{
-		Kernel::Log(1) << "Creating object with " << m_points.size() << " points" << std::endl;
+		if (auto& object = Model::VectorObject::Create(m_points))
+		{
+			Kernel::Log(1) << "Creating object with " << m_points.size() << " points" << std::endl;
+			App::AddCommand(std::make_unique<Model::Command::AddObject>(std::move(object)));
+		}
 
-		auto object = std::make_unique<Model::VectorObject>(m_points);
-		App::AddCommand(std::make_unique<Model::Command::AddObject>(std::move(object)));
-		finished = true;
 		m_points.clear();
+		finished = true;
 	}
 
 	if (!finished)

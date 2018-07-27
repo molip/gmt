@@ -29,8 +29,9 @@ namespace GMT::Model
 	class VectorObject : public Object
 	{
 	public:
+		static std::unique_ptr<VectorObject> Create(std::vector<sf::Vector2f> points);
+			
 		VectorObject();
-		VectorObject(const std::vector<sf::Vector2f>& points);
 		virtual ~VectorObject();
 
 		virtual void Save(Kernel::Serial::SaveNode& node) const;
@@ -66,6 +67,8 @@ namespace GMT::Model
 		const Jig::EdgeMesh& GetMesh() const { return *m_edgeMesh; }
 
 	private:
+		VectorObject(const Jig::Polygon& poly);
+
 		using WallPoints = std::optional<std::pair<Jig::Vec2f, Jig::Vec2f>>;
 		using TriangleMesh = std::vector<sf::Vector2f>;
 		using TriangleMeshPtr = std::unique_ptr<TriangleMesh>;
