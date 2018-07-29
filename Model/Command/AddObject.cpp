@@ -22,6 +22,6 @@ void AddObject::Undo(CommandContext& ctx)
 	if (auto* vector = dynamic_cast<VectorObject*>(m_object.get()))
 	{
 		for (auto& vert : vector->GetMesh().GetVerts())
-			ctx.Deselect(Selection(*vert));
+			ctx.Deselect(Selection(*vector, *vert));
 	}
 }

@@ -110,7 +110,7 @@ void SelectTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 	{
 		Model::Selection selection;
 		if (m_overState.vert)
-			selection.SetVert(*m_overState.vert);
+			selection = Model::Selection(*m_overState.object, *m_overState.vert);
 
 		App::SetSelection(selection);
 	}

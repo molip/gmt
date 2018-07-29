@@ -37,7 +37,7 @@ void GMT::Model::Command::AddWall::Undo(CommandContext & ctx)
 	__super::Undo(ctx);
 	
 	for (auto& vert : m_newVerts)
-		ctx.Deselect(Selection(*vert));
+		ctx.Deselect(Selection(m_object, *vert));
 }
 
 AddWall::Verts AddWall::GetVerts(NewVertVec* newVerts) const

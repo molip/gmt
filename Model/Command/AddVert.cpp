@@ -14,5 +14,5 @@ AddVert::AddVert(const Jig::EdgeMesh::Edge& edge, const Jig::Vec2& position, con
 void GMT::Model::Command::AddVert::Undo(CommandContext & ctx)
 {
 	__super::Undo(ctx);
-	ctx.Deselect(Selection(*m_vert));
+	ctx.Deselect(Selection(m_object, *m_vert));
 }
