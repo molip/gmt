@@ -5,11 +5,11 @@
 #include "../RenderContext.h"
 
 #include "../Model/Command/EdgeMesh.h" 
+#include "../Model/Command/DeleteVert.h"
 #include "../Model/Model.h"
 #include "../Model/Selection.h"
 
 #include "Jig/EdgeMeshCommand.h"
-#include "Jig/PolyLine.h"
 
 #include "libKernel/Log.h"
 #include "libKernel/MinFinder.h"
@@ -130,4 +130,13 @@ void SelectTool::OnMouseUp(sf::Mouse::Button button, const sf::Vector2i & point)
 
 void SelectTool::OnKeyPressed(const sf::Event::KeyEvent event)
 {
+	if (event.code == sf::Keyboard::Delete)
+	{
+		if (auto* vert = App::GetSelection().GetVert())
+		{
+			auto command = std::make_unique<Model::Command::DeleteVert>(*vert, *App::GetSelection().GetObject()); 
+			if (command->CanDo())
+				App::AddCommand(std::move(command));
+		}
+	}
 }

@@ -56,6 +56,9 @@
     <ClCompile Include="Model\Command\AddVert.cpp">
       <Filter>Model\Command</Filter>
     </ClCompile>
+    <ClCompile Include="Model\Command\DeleteVert.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -104,6 +107,9 @@
       <Filter>Tools</Filter>
     </ClInclude>
     <ClInclude Include="Model\Command\AddVert.h">
+      <Filter>Model\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\DeleteVert.h">
       <Filter>Model\Command</Filter>
     </ClInclude>
   </ItemGroup>

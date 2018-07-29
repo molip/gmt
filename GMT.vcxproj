@@ -92,6 +92,7 @@
     <ClCompile Include="Model\Command\AddVert.cpp" />
     <ClCompile Include="Model\Command\AddWall.cpp" />
     <ClCompile Include="Model\Command\Base.cpp" />
+    <ClCompile Include="Model\Command\DeleteVert.cpp" />
     <ClCompile Include="Model\Command\EdgeMesh.cpp" />
     <ClCompile Include="Model\ImageObject.cpp" />
     <ClCompile Include="Model\Model.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="Model\Command\AddVert.h" />
     <ClInclude Include="Model\Command\AddWall.h" />
     <ClInclude Include="Model\Command\Base.h" />
+    <ClInclude Include="Model\Command\DeleteVert.h" />
     <ClInclude Include="Model\Command\EdgeMesh.h" />
     <ClInclude Include="Model\ImageObject.h" />
     <ClInclude Include="Model\Model.h" />
