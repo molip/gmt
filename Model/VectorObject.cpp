@@ -1,5 +1,6 @@
 #include "VectorObject.h"
 #include "../Grid.h"
+#include "../WallMaker.h"
 
 #include "Jig/EdgeMeshInternalEdges.h"
 #include "Jig/Geometry.h"
@@ -19,9 +20,7 @@ using namespace GMT::Model;
 
 namespace
 {
-	const float WallThickness = 1.0f;
 	const float FloorTextureScale = 0.1f;
-	const Jig::Vec2f WallTextureScale(0.5f, 0.5f);
 }
 
 REGISTER_DYNAMIC(VectorObject)
@@ -59,9 +58,6 @@ VectorObject::VectorObject()
 	m_floorTexture = std::make_unique<sf::Texture>();
 	m_floorTexture->loadFromFile("floor.jpg");
 	m_floorTexture->setRepeated(true);
-
-	m_floors.setPrimitiveType(sf::Triangles);
-	m_walls.setPrimitiveType(sf::Triangles);
 }
 
 VectorObject::VectorObject(const Jig::Polygon& poly) : VectorObject()
@@ -122,18 +118,18 @@ void VectorObject::Update() const
 	m_edgeMesh->Update();
 	m_edgeMesh->Dump();
 
-	UpdateFloors();
-	UpdateWalls();
+	m_floors = GetFloors();
+	m_walls = WallMaker(*m_edgeMesh, m_wallTexture->getSize()).GetWalls();
 }
 
-void VectorObject::UpdateFloors() const
+sf::VertexArray VectorObject::GetFloors() const
 {
-	m_floors.clear();
+	sf::VertexArray floors(sf::Triangles);
 
 	const Jig::Vec2f texSize(m_floorTexture->getSize());
 
 	if (texSize.IsZero())
-		return;
+		return {};
 
 	for (auto& face : m_edgeMesh->GetFaces())
 	{
@@ -143,105 +139,11 @@ void VectorObject::UpdateFloors() const
 		{
 			const auto mesh = MakeTriangleMesh(Jig::Triangulator(poly).Go());
 			for (auto& point : *mesh)
-				m_floors.append(sf::Vertex(point, { point.x * texSize.x * FloorTextureScale, point.y * texSize.y * FloorTextureScale }));
+				floors.append(sf::Vertex(point, { point.x * texSize.x * FloorTextureScale, point.y * texSize.y * FloorTextureScale }));
 		}
 	}
-}
 
-void VectorObject::UpdateWalls() const
-{
-	m_walls.clear();
-
-	UpdateWalls(m_edgeMesh->GetOuterPolygon(), Jig::LineAlignment::Outer);
-
-	Jig::EdgeMeshInternalEdges emie(*m_edgeMesh);
-
-	for (auto& line : emie.m_lines)
-	{
-		Jig::PolyLine poly{ line.GetP0(), line.GetP1() };
-		UpdateWalls(poly, Jig::LineAlignment::Centre);
-	}
-}
-
-void VectorObject::UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment alignment) const
-{
-	Jig::PolyLine inner, outer;
-	inner.SetClosed(polyline.IsClosed());
-	outer.SetClosed(polyline.IsClosed());
-
-	for (int i = 0; i < polyline.size(); ++i)
-	{
-		Jig::Vec2f prev, next;
-		const Jig::Vec2f point = polyline.GetVertex(i);
-		
-		const Jig::Vec2f *pPrev{}, *pNext{};
-
-		if (polyline.IsValidIndex(i - 1))
-		{
-			prev = polyline.GetVertex(i - 1);
-			pPrev = &prev;
-		}
-
-		if (polyline.IsValidIndex(i + 1))
-		{
-			next = polyline.GetVertex(i + 1);
-			pNext = &next;
-		}
-
-		auto wallPoints = Jig::GetMitrePoints(point, pPrev, pNext, ::WallThickness, alignment);
-		inner.push_back((*wallPoints).first);
-		outer.push_back((*wallPoints).second);
-	}
-
-	inner.Update();
-	outer.Update();
-
-	if (inner.IsSelfIntersecting() || outer.IsSelfIntersecting())
-		return;
-
-	for (int i = 0; i < outer.GetSegmentCount(); ++i)
-	{
-		const Jig::Vec2f outer0 = outer.GetVertex(i);
-		const Jig::Vec2f inner0 = inner.GetVertex(i);
-		const Jig::Vec2f outer1 = outer.GetVertex(i + 1);
-		const Jig::Vec2f inner1 = inner.GetVertex(i + 1);
-	
-		const Jig::Vec2f outerVec(outer1 - outer0);
-		const Jig::Vec2f innerVec(inner1 - inner0);
-		const Jig::Vec2f edgeVec(inner0 - outer0);
-
-		const float outerLength = outerVec.GetLength();
-		const float innerLength = innerVec.GetLength();
-		const float edgeLength = edgeVec.GetLength();
-
-		Jig::Vec2f outerVecNorm = outerVec;
-		Jig::Vec2f edgeVecNorm = edgeVec;
-		if (!outerVecNorm.Normalise() || !edgeVecNorm.Normalise())
-			return;
-
-		const float cos = outerVecNorm.Dot(edgeVecNorm);
-
-		const float innerOffset = cos * edgeLength;
-
-		const Jig::Vec2f outerTex0;
-		const Jig::Vec2f outerTex1(outerLength, 0);
-		const Jig::Vec2f innerTex0(innerOffset, 1);
-		const Jig::Vec2f innerTex1(innerOffset + innerLength, 1);
-
-		const Jig::Vec2f texSize(m_wallTexture->getSize());
-
-		auto addPoint = [&](auto& point, auto& tex)
-		{
-			m_walls.append(sf::Vertex(point, { tex.x * texSize.x * WallTextureScale.x, tex.y * texSize.y * WallTextureScale.y }));
-		};
-
-		addPoint(outer0, outerTex0);
-		addPoint(outer1, outerTex1);
-		addPoint(inner1, innerTex1);
-		addPoint(inner1, innerTex1);
-		addPoint(inner0, innerTex0);
-		addPoint(outer0, outerTex0);
-	}
+	return floors;
 }
 
 using HitTester = Kernel::MinFinder<VectorObject::Terminus, float>;

@@ -106,6 +106,7 @@
     <ClCompile Include="Tools\Tool.cpp" />
     <ClCompile Include="Tools\VectorTool.cpp" />
     <ClCompile Include="View.cpp" />
+    <ClCompile Include="WallMaker.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +133,7 @@
     <ClInclude Include="Tools\Tool.h" />
     <ClInclude Include="Tools\VectorTool.h" />
     <ClInclude Include="View.h" />
+    <ClInclude Include="WallMaker.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

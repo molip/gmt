@@ -73,11 +73,7 @@ namespace GMT::Model
 		using TriangleMesh = std::vector<sf::Vector2f>;
 		using TriangleMeshPtr = std::unique_ptr<TriangleMesh>;
 
-		bool Init(std::vector<sf::Vector2f> points);
-
-		void UpdateFloors() const;
-		void UpdateWalls() const;
-		void UpdateWalls(const Jig::PolyLine& polyline, Jig::LineAlignment alignment) const;
+		sf::VertexArray GetFloors() const;
 
 		TriangleMeshPtr MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const;
 
