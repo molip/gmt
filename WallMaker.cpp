@@ -73,13 +73,30 @@ void WallMaker::CalculateSlides()
 		}
 	}
 
-	//TODO: Propagate aligns to internal verts.
-
 	auto FindAlignEdge = [&aligns](const Jig::EdgeMesh::Vert* vert)
 	{
 		auto it = aligns.find(vert);
 		return it == aligns.end() ? nullptr : it->second;
 	};
+
+	// Propagate aligns to internally connected verts.
+	// Currently only works for a single vert, which must be on an outer edge.  
+	AlignMap newAligns;
+	for (auto&[vert, edge] : aligns)
+	{
+		const bool slideForward = edge->vert == vert;
+		
+		if (slideForward ? edge->next->twin : edge->prev->twin) // Can't slide to internal verts yet.
+			continue;
+
+		auto* alignVert = (slideForward ? edge->next : edge)->vert;
+
+		if (!FindAlignEdge(alignVert))
+			newAligns[alignVert] = edge;
+	}
+
+	aligns.insert(newAligns.begin(), newAligns.end());
+	newAligns.clear();
 
 	for (auto&[vert, edge] : aligns)
 	{
