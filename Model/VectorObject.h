@@ -77,7 +77,7 @@ namespace GMT::Model
 
 		TriangleMeshPtr MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const;
 
-		mutable sf::VertexArray m_floors, m_walls;
+		mutable sf::VertexArray m_floors, m_innerWalls, m_outerWalls, m_pillars;
 
 		std::unique_ptr<Jig::EdgeMesh> m_edgeMesh;
 		std::unique_ptr<sf::Texture> m_wallTexture, m_floorTexture;

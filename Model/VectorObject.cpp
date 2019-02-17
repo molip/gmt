@@ -99,7 +99,9 @@ void VectorObject::Draw(RenderContext& rc) const
 	rc.GetWindow().draw(m_floors, renderStates);
 
 	renderStates.texture = m_wallTexture.get();
-	rc.GetWindow().draw(m_walls, renderStates);
+	rc.GetWindow().draw(m_innerWalls, renderStates);
+	rc.GetWindow().draw(m_pillars, renderStates);
+	rc.GetWindow().draw(m_outerWalls, renderStates);
 }
 
 VectorObject::TriangleMeshPtr VectorObject::MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const
@@ -119,7 +121,11 @@ void VectorObject::Update() const
 	m_edgeMesh->Dump();
 
 	m_floors = GetFloors();
-	m_walls = WallMaker(*m_edgeMesh, m_wallTexture->getSize()).GetWalls();
+
+	WallMaker wallMaker(*m_edgeMesh, m_wallTexture->getSize());
+	m_innerWalls = wallMaker.GetInnerWalls();
+	m_outerWalls = wallMaker.GetOuterWalls();
+	m_pillars = wallMaker.GetPillars();
 }
 
 sf::VertexArray VectorObject::GetFloors() const
