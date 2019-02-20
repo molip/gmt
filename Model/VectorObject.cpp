@@ -58,6 +58,10 @@ VectorObject::VectorObject()
 	m_floorTexture = std::make_unique<sf::Texture>();
 	m_floorTexture->loadFromFile("floor.jpg");
 	m_floorTexture->setRepeated(true);
+
+	m_pillarTexture = std::make_unique<sf::Texture>();
+	m_pillarTexture->loadFromFile("pillar.png");
+	m_pillarTexture->setRepeated(true);
 }
 
 VectorObject::VectorObject(const Jig::Polygon& poly) : VectorObject()
@@ -100,8 +104,12 @@ void VectorObject::Draw(RenderContext& rc) const
 
 	renderStates.texture = m_wallTexture.get();
 	rc.GetWindow().draw(m_innerWalls, renderStates);
-	rc.GetWindow().draw(m_pillars, renderStates);
+
+	renderStates.texture = m_wallTexture.get();
 	rc.GetWindow().draw(m_outerWalls, renderStates);
+
+	renderStates.texture = m_pillarTexture.get();
+	rc.GetWindow().draw(m_pillars, renderStates);
 }
 
 VectorObject::TriangleMeshPtr VectorObject::MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const
@@ -122,7 +130,7 @@ void VectorObject::Update() const
 
 	m_floors = GetFloors();
 
-	WallMaker wallMaker(*m_edgeMesh, m_wallTexture->getSize());
+	WallMaker wallMaker(*m_edgeMesh, m_wallTexture->getSize(), m_pillarTexture->getSize());
 	m_innerWalls = wallMaker.GetInnerWalls();
 	m_outerWalls = wallMaker.GetOuterWalls();
 	m_pillars = wallMaker.GetPillars();

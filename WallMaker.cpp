@@ -7,17 +7,17 @@ using namespace GMT;
 
 namespace
 {
-	const float OuterWallThickness = 1.0f;
-	const float InnerWallThickness = 0.5f;
-	const float PillarRadius = 0.5f;
-	const Jig::Vec2f WallTextureScale(0.33f, 0.33f);
+	const float OuterWallThickness = 0.5f;
+	const float InnerWallThickness = 0.3f;
+	const float PillarSize = 0.5f;
+	const Jig::Vec2f WallTextureScale(1.0f, 1.0f);
 }
 
-WallMaker::WallMaker(const Jig::EdgeMesh& mesh, const Jig::Vec2f& texSize) : m_mesh(mesh), m_texSize(texSize)
+WallMaker::WallMaker(const Jig::EdgeMesh& mesh, const Jig::Vec2f& texSize, const Jig::Vec2f& pillarTexSize) : m_mesh(mesh), m_texSize(texSize), m_pillarTexSize(pillarTexSize)
 {
 	m_innerWalls.setPrimitiveType(sf::Triangles);
 	m_outerWalls.setPrimitiveType(sf::Triangles);
-	m_pillars.setPrimitiveType(sf::Triangles);
+	m_pillars.setPrimitiveType(sf::Quads);
 	
 	AddOuterWalls();
 	AddInnerWalls();
@@ -76,10 +76,10 @@ void WallMaker::AddInnerWalls()
 
 						these.first = *edge.vert - cross;
 						these.second = *edge.vert;
+
+						m_pillarVerts.insert(edge.vert);
 					}
 					
-					m_pillarVerts.insert(edge.vert);
-
 					if (edge.next->twin) // Internal end vert.
 					{
 						next = getMitrePoints(*edge.next, thickness, Jig::LineAlignment::Inner).value();
@@ -144,25 +144,15 @@ void WallMaker::AddWall(const Jig::Vec2f& outer0, const Jig::Vec2f& outer1, cons
 
 void WallMaker::AddPillar(const Jig::Vec2f& point)
 {
-	auto addPoint = [&](auto& delta)
+	Jig::Vec2f topLeft = point - Jig::Vec2f(::PillarSize, ::PillarSize) * 0.5f;
+
+	auto addPoint = [&](float x, float y)
 	{
-		const float tx = 0.5f * delta.x * m_texSize.x * WallTextureScale.x;
-		const float ty = 0.5f * delta.y * m_texSize.y * WallTextureScale.y;
-		m_pillars.append(sf::Vertex(point + (delta * ::PillarRadius), { tx, ty }));
+		m_pillars.append(sf::Vertex(topLeft + Jig::Vec2f(x * ::PillarSize, y * ::PillarSize), { x * m_pillarTexSize.x, y * m_pillarTexSize.y }));
 	};
 
-	const int segments = 24;
-
-	auto getPoint = [&](int i)
-	{
-		const float angle = 3.14159f * 2 * i / segments;
-		return Jig::Vec2f(::sin(angle), ::cos(angle));
-	};
-
-	for (int i = 0; i < segments; ++i)
-	{
-		addPoint(Jig::Vec2f(0, 0));
-		addPoint(getPoint(i));
-		addPoint(getPoint(i + 1));
-	}
+	addPoint(0, 0);
+	addPoint(1, 0);
+	addPoint(1, 1);
+	addPoint(0, 1);
 }

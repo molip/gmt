@@ -16,7 +16,7 @@ namespace GMT
 	class WallMaker
 	{
 	public:
-		WallMaker(const Jig::EdgeMesh& mesh, const Jig::Vec2f& texSize);
+		WallMaker(const Jig::EdgeMesh& mesh, const Jig::Vec2f& texSize, const Jig::Vec2f& pillarTexSize);
 
 		sf::VertexArray&& GetInnerWalls() { return std::move(m_innerWalls); }
 		sf::VertexArray&& GetOuterWalls() { return std::move(m_outerWalls); }
@@ -29,7 +29,7 @@ namespace GMT
 		void AddPillar(const Jig::Vec2f& point);
 
 		const Jig::EdgeMesh& m_mesh;
-		const Jig::Vec2f& m_texSize;
+		const Jig::Vec2f& m_texSize, m_pillarTexSize;
 		sf::VertexArray m_innerWalls, m_outerWalls, m_pillars;
 		std::set<const Jig::EdgeMesh::Vert*> m_pillarVerts;
 	};

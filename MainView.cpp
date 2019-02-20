@@ -17,8 +17,7 @@ namespace
 {
 	const int LogWidth = 1920;
 	const int LogHeight = 1080;
-	//const int GridSize = 50;
-	const int GridSize = 100;
+	const int GridSize = 150;
 	//const int GridSize = int(LogHeight / (530 / 25.4f));
 }
 
