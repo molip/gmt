@@ -40,29 +40,6 @@ namespace GMT::Model
 		virtual void Draw(RenderContext& rc) const override;
 		virtual void Update() const override;
 
-		using VertTerminus = const Jig::EdgeMesh::Vert*;
-		using EdgeTerminus = std::pair<const Jig::EdgeMesh::Edge*, Jig::Vec2>;
-		struct Terminus : public std::variant<std::monostate, VertTerminus, EdgeTerminus>
-		{
-			using std::variant<std::monostate, VertTerminus, EdgeTerminus>::variant;
-			const VertTerminus* GetVert() const { return std::get_if<VertTerminus>(this); }
-			const EdgeTerminus* GetEdge() const { return std::get_if<EdgeTerminus>(this); }
-			bool IsEmpty() const { return index() == 0; }
-			const Jig::Vec2* GetPoint() const
-			{
-				if (auto vert = GetVert())
-					return *vert;
-				if (auto edge = GetEdge())
-					return &edge->second;
-				return nullptr;
-			}
-
-			void Log(int indent) const;
-		};
-
-		Terminus HitTestEdges(const sf::Vector2f& point, float tolerance, float& distSquared) const;
-		const Jig::EdgeMesh::Face* HitTestRooms(const sf::Vector2f& point) const;
-
 		Jig::EdgeMesh& GetMesh() { return *m_edgeMesh; }
 		const Jig::EdgeMesh& GetMesh() const { return *m_edgeMesh; }
 

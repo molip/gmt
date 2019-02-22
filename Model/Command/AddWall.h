@@ -3,6 +3,7 @@
 #include "EdgeMesh.h"
 
 #include "../VectorObject.h"
+#include "../Element.h"
 
 #include "Jig/PolyLine.h"
 
@@ -10,9 +11,8 @@ namespace GMT::Model::Command
 {
 	class AddWall : public EdgeMesh
 	{
-		using Terminus = VectorObject::Terminus;
 	public:
-		AddWall(const Terminus& start, const Terminus& end, const Jig::PolyLine& points, const VectorObject& object);
+		AddWall(ElementPtr start, ElementPtr end, const Jig::PolyLine& points, const VectorObject& object);
 
 		virtual void Do(CommandContext& ctx) override;
 		virtual void Undo(CommandContext& ctx) override;
@@ -26,7 +26,7 @@ namespace GMT::Model::Command
 
 		Verts GetVerts(NewVertVec* newVerts) const;
 			
-		const Terminus m_start, m_end;
+		ElementPtr m_start, m_end;
 		Jig::PolyLine m_points;
 
 		NewVertVec m_newVerts;

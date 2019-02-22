@@ -25,7 +25,7 @@ namespace
 	const float SmallDotRadius = 5; // Logical.
 }
 
-SelectTool::SelectTool(const MainView& view) : m_view(view)
+SelectTool::SelectTool(const MainView& view) : Tool(view)
 {
 }
 
@@ -55,8 +55,8 @@ void SelectTool::Draw(RenderContext& rc) const
 					drawCircle(sf::Vector2f(*vert), SmallDotRadius, sf::Color::Yellow);
 	}
 
-	if (m_overState.vert)
-		drawCircle(sf::Vector2f(*m_overState.vert), BigDotRadius, sf::Color::Yellow);
+	if (m_overState)
+		drawCircle(sf::Vector2f(*m_overState->vert), BigDotRadius, sf::Color::Yellow);
 }
 
 void SelectTool::OnMouseMoved(const sf::Vector2i& point)
@@ -66,11 +66,9 @@ void SelectTool::OnMouseMoved(const sf::Vector2i& point)
 
 void SelectTool::Update(const sf::Vector2f& logPoint)
 {
-	m_gridPoint = m_view.GetGrid().GetGridPoint(logPoint);
-
 	if (m_dragging)
 	{
-		auto& vert = *const_cast<Jig::EdgeMesh::Vert*>(m_overState.vert);
+		auto& vert = *const_cast<Jig::EdgeMesh::Vert*>(m_overState->vert);
 		auto snapped = Jig::Vec2(m_view.GetGrid().GetNearestGridPoint(logPoint, nullptr));
 		
 		if (vert != snapped)
@@ -79,26 +77,13 @@ void SelectTool::Update(const sf::Vector2f& logPoint)
 				m_command->UndoNoUpdate();
 
 			auto moveCommand = std::make_unique<Jig::EdgeMeshCommand::MoveVert>(vert, snapped);
-			m_command = std::make_unique<Model::Command::EdgeMesh>(std::move(moveCommand), *m_overState.object);
+			m_command = std::make_unique<Model::Command::EdgeMesh>(std::move(moveCommand), *m_overState->GetObject());
 			App::DoCommand(*m_command);
 		}
 	}
 	else
 	{
-		Kernel::MinFinder<OverState, float> minFinder(0.5f); // 0.5^2 + 0.5^2
-
-		for (auto& object : App::GetModel().GetObjects())
-		{
-			if (Model::VectorObject* vectorObject = dynamic_cast<Model::VectorObject*>(object.get()))
-			{
-				float distSquared{};
-				auto result = vectorObject->HitTestEdges(m_gridPoint, std::sqrt(minFinder.GetValue()), distSquared);
-				if (auto vert = result.GetVert())
-					minFinder.Try({ *vert, vectorObject }, distSquared);
-			}
-		}
-
-		m_overState = minFinder.GetObject();
+		m_overState = std::dynamic_pointer_cast<Model::VertElement>(HitTest(logPoint, nullptr, { HitTestOpt::Verts }));
 	}
 }
 
@@ -106,16 +91,17 @@ void SelectTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 {
 	Kernel::Log() << "SelectTool::OnMouseDown dev=" << point << std::endl;
 
-	if (m_overState.vert != App::GetSelection().GetVert())
+	auto* vert = m_overState ? m_overState->vert : nullptr;
+	if (vert != App::GetSelection().GetVert())
 	{
 		Model::Selection selection;
-		if (m_overState.vert)
-			selection = Model::Selection(*m_overState.object, *m_overState.vert);
+		if (vert)
+			selection = Model::Selection(*m_overState->GetObject(), *vert);
 
 		App::SetSelection(selection);
 	}
 
-	m_dragging = m_overState.vert;
+	m_dragging = vert;
 }
 
 void SelectTool::OnMouseUp(sf::Mouse::Button button, const sf::Vector2i & point)

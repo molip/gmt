@@ -102,6 +102,7 @@
     <ClCompile Include="Model\VectorObject.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="Tools\AddVertTool.cpp" />
+    <ClCompile Include="Tools\HitTester.cpp" />
     <ClCompile Include="Tools\SelectTool.cpp" />
     <ClCompile Include="Tools\Tool.cpp" />
     <ClCompile Include="Tools\VectorTool.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="Model\Command\Base.h" />
     <ClInclude Include="Model\Command\DeleteVert.h" />
     <ClInclude Include="Model\Command\EdgeMesh.h" />
+    <ClInclude Include="Model\Element.h" />
     <ClInclude Include="Model\ImageObject.h" />
     <ClInclude Include="Model\Model.h" />
     <ClInclude Include="Model\Notification.h" />
@@ -129,6 +131,7 @@
     <ClInclude Include="Model\VectorObject.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="Tools\AddVertTool.h" />
+    <ClInclude Include="Tools\HitTester.h" />
     <ClInclude Include="Tools\SelectTool.h" />
     <ClInclude Include="Tools\Tool.h" />
     <ClInclude Include="Tools\VectorTool.h" />

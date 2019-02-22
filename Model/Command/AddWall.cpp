@@ -8,8 +8,8 @@
 using namespace GMT::Model;
 using namespace GMT::Model::Command;
 
-AddWall::AddWall(const Terminus& start, const Terminus& end, const Jig::PolyLine& points, const VectorObject& object) :
-	EdgeMesh(object), m_start(start), m_end(end), m_points(points)
+AddWall::AddWall(ElementPtr start, ElementPtr end, const Jig::PolyLine& points, const VectorObject& object) :
+	EdgeMesh(object), m_start(std::move(start)), m_end(std::move(end)), m_points(points)
 {
 }
 
@@ -44,9 +44,9 @@ AddWall::Verts AddWall::GetVerts(NewVertVec* newVerts) const
 {
 	auto compound = std::make_unique<Jig::EdgeMeshCommand::Compound>();
 
-	auto insertVert = [&](const VectorObject::EdgeTerminus& term)
+	auto insertVert = [&](const EdgePointElement& term)
 	{
-		auto command = std::make_unique<Jig::EdgeMeshCommand::InsertVert>(GetMesh(), const_cast<Jig::EdgeMesh::Edge&>(*term.first), term.second);
+		auto command = std::make_unique<Jig::EdgeMeshCommand::InsertVert>(GetMesh(), const_cast<Jig::EdgeMesh::Edge&>(*term.edge), term.point);
 		auto* vert = command->GetVert();
 		if (newVerts)
 			newVerts->push_back(vert);
@@ -55,24 +55,24 @@ AddWall::Verts AddWall::GetVerts(NewVertVec* newVerts) const
 		return vert;
 	};
 
-	auto* startEdgeTerm = m_start.GetEdge();
-	auto* endEdgeTerm = m_end.GetEdge();
+	auto* startEdgeTerm = m_start->GetAs<EdgePointElement>();
+	auto* endEdgeTerm = m_end->GetAs<EdgePointElement>();
 
-	if (startEdgeTerm && endEdgeTerm && startEdgeTerm->first == endEdgeTerm->first) // Same edge! 
+	if (startEdgeTerm && endEdgeTerm && startEdgeTerm->edge == endEdgeTerm->edge) // Same edge! 
 	{
 		Jig::EdgeMesh::Vert* startVert{};
 		Jig::EdgeMesh::Vert* endVert{};
 
 		// We have to do the one nearest the vert first. 
-		std::vector<std::pair<Jig::EdgeMesh::Vert**, const VectorObject::EdgeTerminus*>> vec;
+		std::vector<std::pair<Jig::EdgeMesh::Vert**, const EdgePointElement*>> vec;
 		vec = { { &startVert, startEdgeTerm },{ &endVert, endEdgeTerm } };
 
 		std::sort(vec.begin(), vec.end(), [&](auto& lhs, auto& rhs)
 		{
 			auto& lhsTerm = *lhs.second;
 			auto& rhsTerm = *rhs.second;
-			return Jig::Vec2(lhsTerm.second - *lhsTerm.first->vert).GetLengthSquared() < 
-				Jig::Vec2(rhsTerm.second - *rhsTerm.first->vert).GetLengthSquared();
+			return Jig::Vec2(lhsTerm.point - *lhsTerm.edge->vert).GetLengthSquared() < 
+				Jig::Vec2(rhsTerm.point - *rhsTerm.edge->vert).GetLengthSquared();
 		});
 
 		for (auto&[vert, term] : vec)
@@ -81,19 +81,19 @@ AddWall::Verts AddWall::GetVerts(NewVertVec* newVerts) const
 		return { startVert, endVert, std::move(compound) };
 	}
 
-	auto getVert = [&](const Terminus& term)
+	auto getVert = [&](const Element& term)
 	{
 		Jig::EdgeMesh::Vert* result{};
 
-		if (auto* vertTerm = term.GetVert())
-			result = const_cast<Jig::EdgeMesh::Vert*>(*vertTerm);
-		else if (auto* edgeTerm = term.GetEdge())
+		if (auto* vertTerm = term.GetAs<VertElement>())
+			result = const_cast<Jig::EdgeMesh::Vert*>(vertTerm->vert);
+		else if (auto* edgeTerm = term.GetAs<EdgePointElement>())
 			result = insertVert(*edgeTerm);
 
 		return result;
 	};
 
-	return { getVert(m_start), getVert(m_end), std::move(compound) };
+	return { getVert(*m_start), getVert(*m_end), std::move(compound) };
 }
 
 bool GMT::Model::Command::AddWall::CanDo() const
