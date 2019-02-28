@@ -29,8 +29,7 @@ namespace GMT::Tools
 		virtual void OnKeyPressed(const sf::Event::KeyEvent event) {}
 
 	protected:
-		using HitTestOpt = HitTester::Option;
-		Model::ElementPtr HitTest(const sf::Vector2f& logPoint, const Model::VectorObject* special, const HitTester::Options& opts = HitTester::DefaultOptions) const;
+		Model::ElementPtr HitTest(const sf::Vector2f& logPoint, const Model::VectorObject* special, const HitTester::Options& opts) const;
 
 		const MainView& m_view;
 	};

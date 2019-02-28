@@ -79,7 +79,8 @@ void VectorTool::Update(const sf::Vector2f& logPoint)
 {
 	if (m_objectEdit)
 	{
-		m_overState = HitTest(logPoint, m_objectEdit->object);
+		using Opt = HitTester::Option;
+		m_overState = HitTest(logPoint, m_objectEdit->object, { Opt::Verts, Opt::EdgePoints, Opt::Grid });
 		if (m_overState == m_objectEdit->start) // Back where we started.
 			m_overState.reset();
 
@@ -99,7 +100,8 @@ void VectorTool::Update(const sf::Vector2f& logPoint)
 	}
 	else
 	{
-		m_overState = HitTest(logPoint, nullptr);
+		using Opt = HitTester::Option;
+		m_overState = HitTest(logPoint, nullptr, { Opt::Verts, Opt::EdgePoints, Opt::Grid });
 
 		if (auto* gridElement = m_overState->GetAs<Model::GridElement>())
 			if (gridElement->face) // Can't start a new object in a room.

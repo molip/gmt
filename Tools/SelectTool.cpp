@@ -83,7 +83,7 @@ void SelectTool::Update(const sf::Vector2f& logPoint)
 	}
 	else
 	{
-		m_overState = std::dynamic_pointer_cast<Model::VertElement>(HitTest(logPoint, nullptr, { HitTestOpt::Verts }));
+		m_overState = std::dynamic_pointer_cast<Model::VertElement>(HitTest(logPoint, nullptr, { HitTester::Option::Verts }));
 	}
 }
 

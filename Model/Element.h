@@ -28,14 +28,21 @@ namespace GMT::Model
 	};
 	using VertElementPtr = std::shared_ptr<VertElement>;
 
-	class EdgePointElement : public Element
+	class EdgeElement : public Element
 	{
 	public:
-		EdgePointElement(const VectorObject* object, const Jig::EdgeMesh::Edge* edge, const Jig::Vec2& point) : object(object), edge(edge), point(point) {}
-		virtual Jig::Vec2f GetPoint() const override { return Jig::Vec2f(point); }
+		EdgeElement(const VectorObject* object, const Jig::EdgeMesh::Edge* edge) : object(object), edge(edge) {}
 		virtual const VectorObject* GetObject() const override { return object; }
 		const VectorObject* object{};
 		const Jig::EdgeMesh::Edge* edge{};
+	};
+	using EdgeElementPtr = std::shared_ptr<EdgeElement>;
+
+	class EdgePointElement : public EdgeElement
+	{
+	public:
+		EdgePointElement(const VectorObject* object, const Jig::EdgeMesh::Edge* edge, const Jig::Vec2& point) : EdgeElement(object, edge), point(point) {}
+		virtual Jig::Vec2f GetPoint() const override { return Jig::Vec2f(point); }
 		const Jig::Vec2 point;
 	};
 	using EdgePointElementPtr = std::shared_ptr<EdgePointElement>;
@@ -47,5 +54,14 @@ namespace GMT::Model
 		virtual Jig::Vec2f GetPoint() const { return Jig::Vec2f(point); }
 		const Jig::EdgeMesh::Face* face{};
 		const Jig::Vec2 point;
+	};
+
+	class FaceElement : public Element
+	{
+	public:
+		FaceElement(const VectorObject* object, const Jig::EdgeMesh::Face* face) : object(object), face(face) {}
+		virtual const VectorObject* GetObject() const override { return object; }
+		const VectorObject* object{};
+		const Jig::EdgeMesh::Face* face{};
 	};
 }

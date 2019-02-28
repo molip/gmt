@@ -63,6 +63,15 @@
     <ClCompile Include="Tools\HitTester.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
+    <ClCompile Include="Tools\DeleteTool.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Command\MergeFace.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Command\DeleteFace.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -122,6 +131,15 @@
     </ClInclude>
     <ClInclude Include="Model\Element.h">
       <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\DeleteTool.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\MergeFace.h">
+      <Filter>Model\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\DeleteFace.h">
+      <Filter>Model\Command</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

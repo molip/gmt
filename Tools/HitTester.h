@@ -18,17 +18,16 @@ namespace GMT::Tools
 	class HitTester
 	{
 	public:
-		enum class Option { Verts, Edges, Grid, _Count };
+		enum class Option { Verts, EdgePoints, InternalEdges, Faces, Grid, _Count };
 		using Options = Kernel::EnumBitset<Option>;
 
-		inline static const Options DefaultOptions = { Option::Verts, Option::Edges, Option::Grid };
-
-		HitTester(const MainView& view, const Options& opts = { Option::Verts, Option::Edges, Option::Grid });
+		HitTester(const MainView& view, const Options& opts);
 
 		Model::ElementPtr HitTest(const sf::Vector2f& logPoint, const Model::VectorObject* special) const;
 
 	protected:
 		using MinFinder = Kernel::MinFinder<Model::ElementPtr, float>;
+		struct Priority { enum Type { Grid, Face, Edge, Vert }; };
 
 		void HitTestObject(const Model::VectorObject& object, const sf::Vector2f& point, MinFinder& minFinder, float threshold) const;
 		void HitTestEdge(const Model::VectorObject& object, const sf::Vector2f& point, const Jig::EdgeMesh::Edge& edge, const Jig::EdgeMesh::Edge& nextEdge, MinFinder& minFinder, float threshold) const;

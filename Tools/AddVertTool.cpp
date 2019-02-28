@@ -53,7 +53,7 @@ void AddVertTool::OnMouseMoved(const sf::Vector2i& point)
 
 void AddVertTool::Update(const sf::Vector2f& logPoint)
 {
-	m_overState = std::dynamic_pointer_cast<Model::EdgePointElement>(HitTest(logPoint, nullptr, { HitTestOpt::Edges }));
+	m_overState = std::dynamic_pointer_cast<Model::EdgePointElement>(HitTest(logPoint, nullptr, { HitTester::Option::EdgePoints }));
 }
 
 void AddVertTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & point)
