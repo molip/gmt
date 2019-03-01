@@ -39,6 +39,8 @@ GMT::App::App()
 	m_model = std::make_unique<Model::Model>();
 	m_selection = std::make_unique<Model::Selection>();
 	m_commandStack = std::make_unique<Model::CommandStack>(*m_model);
+
+	m_model->LoadFile(m_rootPath + L"\\_default.gmt");
 }
 
 GMT::App::~App() = default;
