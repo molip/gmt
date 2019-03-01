@@ -50,9 +50,6 @@
     <ClCompile Include="Model\Notification.cpp">
       <Filter>Model</Filter>
     </ClCompile>
-    <ClCompile Include="Tools\AddVertTool.cpp">
-      <Filter>Tools</Filter>
-    </ClCompile>
     <ClCompile Include="Model\Command\AddVert.cpp">
       <Filter>Model\Command</Filter>
     </ClCompile>
@@ -115,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="Model\Notification.h">
       <Filter>Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Tools\AddVertTool.h">
-      <Filter>Tools</Filter>
     </ClInclude>
     <ClInclude Include="Model\Command\AddVert.h">
       <Filter>Model\Command</Filter>

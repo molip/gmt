@@ -23,9 +23,9 @@ namespace GMT::Tools
 	private:
 		void Update(const sf::Vector2f& logPoint);
 
-		Model::VertElementPtr m_overState;
+		Model::ElementPtr m_overState;
 
-		bool m_dragging{};
+		const Jig::EdgeMesh::Vert* m_dragVert {};
 		std::unique_ptr<Model::Command::EdgeMesh> m_command;
 	};
 }

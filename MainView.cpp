@@ -5,7 +5,6 @@
 #include "Model/VectorObject.h"
 #include "Model/Model.h"
 
-#include "Tools/AddVertTool.h"
 #include "Tools/DeleteTool.h"
 #include "Tools/SelectTool.h"
 #include "Tools/VectorTool.h"
@@ -145,10 +144,8 @@ void MainView::OnKeyPressed(const sf::Event::KeyEvent event)
 	else if (event.code == sf::Keyboard::F1)
 		m_tool = std::make_unique<Tools::SelectTool>(*this);
 	else if (event.code == sf::Keyboard::F2)
-		m_tool = std::make_unique<Tools::AddVertTool>(*this);
-	else if (event.code == sf::Keyboard::F3)
 		m_tool = std::make_unique<Tools::VectorTool>(*this);
-	else if (event.code == sf::Keyboard::F4)
+	else if (event.code == sf::Keyboard::F3)
 		m_tool = std::make_unique<Tools::DeleteTool>(*this);
 	else
 		m_tool->OnKeyPressed(event);

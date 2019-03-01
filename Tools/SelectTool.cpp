@@ -4,6 +4,7 @@
 #include "../MainView.h"
 #include "../RenderContext.h"
 
+#include "../Model/Command/AddVert.h"
 #include "../Model/Command/EdgeMesh.h" 
 #include "../Model/Command/DeleteVert.h"
 #include "../Model/Model.h"
@@ -47,16 +48,23 @@ void SelectTool::Draw(RenderContext& rc) const
 	if (auto* selectedVert = App::GetSelection().GetVert())
 		drawCircle(sf::Vector2f(*selectedVert), BigDotRadius, sf::Color::Yellow, true);
 
-	if (!m_dragging)
+	if (m_dragVert)
+	{
+		drawCircle(sf::Vector2f(*m_dragVert), BigDotRadius, sf::Color::Yellow);
+	}
+	else
 	{
 		for (auto& object : App::GetModel().GetObjects())
 			if (Model::VectorObject* vectorObject = dynamic_cast<Model::VectorObject*>(object.get()))
 				for (auto& vert : vectorObject->GetMesh().GetVerts())
 					drawCircle(sf::Vector2f(*vert), SmallDotRadius, sf::Color::Yellow);
-	}
 
-	if (m_overState)
-		drawCircle(sf::Vector2f(*m_overState->vert), BigDotRadius, sf::Color::Yellow);
+		if (m_overState)
+		{
+			const sf::Color colour = m_overState->GetAs<Model::VertElement>() ? sf::Color::Yellow : sf::Color::Blue;
+			drawCircle(m_overState->GetPoint(), BigDotRadius, colour);
+		}
+	}
 }
 
 void SelectTool::OnMouseMoved(const sf::Vector2i& point)
@@ -66,9 +74,9 @@ void SelectTool::OnMouseMoved(const sf::Vector2i& point)
 
 void SelectTool::Update(const sf::Vector2f& logPoint)
 {
-	if (m_dragging)
+	if (m_dragVert)
 	{
-		auto& vert = *const_cast<Jig::EdgeMesh::Vert*>(m_overState->vert);
+		auto& vert = *const_cast<Jig::EdgeMesh::Vert*>(m_dragVert);
 		auto snapped = Jig::Vec2(m_view.GetGrid().GetNearestGridPoint(logPoint, nullptr));
 		
 		if (vert != snapped)
@@ -83,7 +91,8 @@ void SelectTool::Update(const sf::Vector2f& logPoint)
 	}
 	else
 	{
-		m_overState = std::dynamic_pointer_cast<Model::VertElement>(HitTest(logPoint, nullptr, { HitTester::Option::Verts }));
+		using Opt = HitTester::Option;
+		m_overState = HitTest(logPoint, nullptr, { Opt::Verts, Opt::EdgePoints });
 	}
 }
 
@@ -91,7 +100,21 @@ void SelectTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 {
 	Kernel::Log() << "SelectTool::OnMouseDown dev=" << point << std::endl;
 
-	auto* vert = m_overState ? m_overState->vert : nullptr;
+	const Jig::EdgeMesh::Vert* vert{};
+
+	if (auto* element = m_overState->GetAs<Model::EdgePointElement>())
+	{
+		auto command = std::make_unique<Model::Command::AddVert>(*element->edge, element->point, *element->object);
+		auto* save = command.get();
+		App::AddCommand(std::move(command));
+
+		vert = save->GetNewVert();
+	}
+	if (auto* element = m_overState->GetAs<Model::VertElement>())
+	{
+		vert = element->vert;
+	}
+
 	if (vert != App::GetSelection().GetVert())
 	{
 		Model::Selection selection;
@@ -101,17 +124,19 @@ void SelectTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 		App::SetSelection(selection);
 	}
 
-	m_dragging = vert;
+	m_dragVert = vert;
 }
 
 void SelectTool::OnMouseUp(sf::Mouse::Button button, const sf::Vector2i & point)
 {
 	Kernel::Log() << "SelectTool::OnMouseUp dev=" << point << std::endl;
 
+	m_dragVert = nullptr;
+
 	if (m_command)
 		App::AddCommand(std::move(m_command), true);
-	
-	m_dragging = false;
+
+	Update(m_view.DevToLog(point));
 }
 
 void SelectTool::OnKeyPressed(const sf::Event::KeyEvent event)
