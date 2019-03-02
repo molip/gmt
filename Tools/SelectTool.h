@@ -19,6 +19,7 @@ namespace GMT::Tools
 		virtual void OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point) override;
 		virtual void OnMouseUp(sf::Mouse::Button button, const sf::Vector2i& point) override;
 		virtual void OnKeyPressed(const sf::Event::KeyEvent event) override;
+		virtual void Update() override { m_overState = nullptr; }
 
 	private:
 		void Update(const sf::Vector2f& logPoint);

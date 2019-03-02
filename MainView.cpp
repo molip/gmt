@@ -122,12 +122,18 @@ void MainView::OnKeyPressed(const sf::Event::KeyEvent event)
 		if (event.shift)
 		{
 			if (App::CanRedo())
+			{
 				App::Redo();
+				m_tool->Update();
+			}
 		}
 		else
 		{
 			if (App::CanUndo())
+			{
 				App::Undo();
+				m_tool->Update();
+			}
 		}
 	}
 	else if (event.control && event.code == sf::Keyboard::S)
