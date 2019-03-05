@@ -102,6 +102,8 @@
     <ClCompile Include="Model\Object.cpp" />
     <ClCompile Include="Model\Selection.cpp" />
     <ClCompile Include="Model\VectorObject.cpp" />
+    <ClCompile Include="Model\WallThing.cpp" />
+    <ClCompile Include="Model\WallThingOp.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="Tools\HitTester.cpp" />
     <ClCompile Include="Tools\DeleteTool.cpp" />
@@ -133,6 +135,8 @@
     <ClInclude Include="Model\Object.h" />
     <ClInclude Include="Model\Selection.h" />
     <ClInclude Include="Model\VectorObject.h" />
+    <ClInclude Include="Model\WallThing.h" />
+    <ClInclude Include="Model\WallThingOp.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="Tools\HitTester.h" />
     <ClInclude Include="Tools\DeleteTool.h" />

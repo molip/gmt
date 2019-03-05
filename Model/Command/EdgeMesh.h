@@ -1,10 +1,14 @@
 #pragma once
 
 #include "Base.h"
+#include "../WallThingOp.h"
 
 #include "Jig/EdgeMeshCommand.h"
 
-namespace GMT::Model { class VectorObject; }
+namespace GMT::Model 
+{
+	class VectorObject; 
+}
 
 namespace GMT::Model::Command
 {

@@ -37,11 +37,14 @@ bool GMT::Model::Model::SaveFile(const std::wstring& path) const
 
 void GMT::Model::Model::Load(const Kernel::Serial::LoadNode& node)
 {
+	Kernel::Serial::LoadContext ctx(node);
 	node.LoadCntr("objects", m_objects, Serial::ObjectLoader());
+	ctx.ResolveRefs();
 }
 
 void GMT::Model::Model::Save(Kernel::Serial::SaveNode& node) const
 {
+	Kernel::Serial::SaveContext ctx(node);
 	node.SaveCntr("objects", m_objects, Serial::ObjectSaver());
 }
 

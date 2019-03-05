@@ -10,9 +10,11 @@ namespace GMT::Model::Command
 		MergeFace(const Jig::EdgeMesh::Edge& edge, const VectorObject& object);
 
 		virtual void Do(CommandContext& ctx) override;
+		virtual void Undo(CommandContext& ctx) override;
 		virtual void Redo(CommandContext& ctx) override;
 
 	private:
 		Jig::EdgeMesh::Edge& m_edge;
+		WallThingOpPtr m_op;
 	};
 }

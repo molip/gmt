@@ -10,9 +10,11 @@ namespace GMT::Model::Command
 		DeleteFace(const Jig::EdgeMesh::Face& face, const VectorObject& object);
 
 		virtual void Do(CommandContext& ctx) override;
+		virtual void Undo(CommandContext& ctx) override;
 		virtual void Redo(CommandContext& ctx) override;
 
 	private:
 		Jig::EdgeMesh::Face& m_face;
+		WallThingOpPtr m_op;
 	};
 }

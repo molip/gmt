@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Object.h"
+#include "WallThing.h"
 
 #include "Jig/EdgeMesh.h"
 #include "Jig/Line2.h"
@@ -43,6 +44,9 @@ namespace GMT::Model
 		Jig::EdgeMesh& GetMesh() { return *m_edgeMesh; }
 		const Jig::EdgeMesh& GetMesh() const { return *m_edgeMesh; }
 
+		const WallThings& GetWallThings() const { return m_wallThings; }
+		WallThings& GetWallThings() { return m_wallThings; }
+
 	private:
 		VectorObject(const Jig::Polygon& poly);
 
@@ -58,5 +62,7 @@ namespace GMT::Model
 
 		std::unique_ptr<Jig::EdgeMesh> m_edgeMesh;
 		std::unique_ptr<sf::Texture> m_wallTexture, m_floorTexture, m_pillarTexture;
+
+		WallThings m_wallThings;
 	};
 }

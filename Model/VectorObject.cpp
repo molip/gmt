@@ -86,11 +86,13 @@ VectorObject::~VectorObject() = default;
 void VectorObject::Save(Kernel::Serial::SaveNode & node) const
 {
 	node.SaveClassPtr("mesh", m_edgeMesh);
+	node.SaveClass("wall_things", m_wallThings);
 }
 
 void VectorObject::Load(const Kernel::Serial::LoadNode & node)
 {
 	node.LoadClassPtr("mesh", m_edgeMesh);
+	node.LoadClass("wall_things", m_wallThings);
 	Update();
 }
 
@@ -109,6 +111,9 @@ void VectorObject::Draw(RenderContext& rc) const
 
 	renderStates.texture = m_pillarTexture.get();
 	rc.GetWindow().draw(m_pillars, renderStates);
+
+	renderStates.texture = nullptr;
+	m_wallThings.Draw(rc);
 }
 
 VectorObject::TriangleMeshPtr VectorObject::MakeTriangleMesh(const Jig::EdgeMesh& edgeMesh) const
