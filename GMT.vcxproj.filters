@@ -84,6 +84,9 @@
     <ClCompile Include="Model\Command\DeleteWallThing.cpp">
       <Filter>Model\Command</Filter>
     </ClCompile>
+    <ClCompile Include="Model\Command\MoveWallThing.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -163,6 +166,9 @@
       <Filter>Model\Command</Filter>
     </ClInclude>
     <ClInclude Include="Model\Command\DeleteWallThing.h">
+      <Filter>Model\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\MoveWallThing.h">
       <Filter>Model\Command</Filter>
     </ClInclude>
   </ItemGroup>

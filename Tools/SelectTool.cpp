@@ -7,6 +7,7 @@
 #include "../Model/Command/AddVert.h"
 #include "../Model/Command/EdgeMesh.h" 
 #include "../Model/Command/DeleteVert.h"
+#include "../Model/Command/MoveWallThing.h"
 #include "../Model/Model.h"
 #include "../Model/Selection.h"
 
@@ -48,9 +49,9 @@ void SelectTool::Draw(RenderContext& rc) const
 	if (auto* selectedVert = App::GetSelection().GetVert())
 		drawCircle(sf::Vector2f(*selectedVert), BigDotRadius, sf::Color::Yellow, true);
 
-	if (m_dragVert)
+	if (m_dragging)
 	{
-		drawCircle(sf::Vector2f(*m_dragVert), BigDotRadius, sf::Color::Yellow);
+		drawCircle(m_overState->GetPointF(), BigDotRadius, sf::Color::Yellow);
 	}
 	else
 	{
@@ -61,7 +62,7 @@ void SelectTool::Draw(RenderContext& rc) const
 
 		if (m_overState)
 		{
-			const sf::Color colour = m_overState->GetAs<Model::VertElement>() ? sf::Color::Yellow : sf::Color::Blue;
+			const sf::Color colour = m_overState->GetAs<Model::EdgeElement>() ? sf::Color::Blue : sf::Color::Yellow;
 			drawCircle(m_overState->GetPointF(), BigDotRadius, colour);
 		}
 	}
@@ -74,25 +75,42 @@ void SelectTool::OnMouseMoved(const sf::Vector2i& point)
 
 void SelectTool::Update(const sf::Vector2f& logPoint)
 {
-	if (m_dragVert)
+	if (m_dragging)
 	{
-		auto& vert = *const_cast<Jig::EdgeMesh::Vert*>(m_dragVert);
-		auto snapped = Jig::Vec2(m_view.GetGrid().GetNearestGridPoint(logPoint, nullptr));
-		
-		if (vert != snapped)
+		if (auto* element = m_overState->GetAs<Model::VertElement>())
 		{
-			if (m_command)
-				m_command->UndoNoUpdate();
+			auto& vert = *const_cast<Jig::EdgeMesh::Vert*>(element->vert);
+			auto snapped = Jig::Vec2(m_view.GetGrid().GetNearestGridPoint(logPoint, nullptr));
 
-			auto moveCommand = std::make_unique<Jig::EdgeMeshCommand::MoveVert>(vert, snapped);
-			m_command = std::make_unique<Model::Command::EdgeMesh>(std::move(moveCommand), *m_overState->GetObject());
-			App::DoCommand(*m_command);
+			if (vert != snapped)
+			{
+				if (m_command)
+					m_command->UndoNoUpdate();
+
+				auto moveCommand = std::make_unique<Jig::EdgeMeshCommand::MoveVert>(vert, snapped);
+				m_command = std::make_unique<Model::Command::EdgeMesh>(std::move(moveCommand), *m_overState->GetObject());
+				App::DoCommand(*m_command);
+			}
 		}
+		else if (auto* element = m_overState->GetAs<Model::WallThingElement>())
+		{
+			auto hit = HitTest(logPoint, element->object, { HitTester::Option::Edges }, false);
+			if (auto& hitElement = std::dynamic_pointer_cast<Model::EdgeElement>(hit))
+			{
+				if (m_command)
+					m_command->UndoNoUpdate();
+
+				const Model::WallThing::Position position = { hitElement->edge, hitElement->normalisedDist };
+				m_command = std::make_unique<Model::Command::MoveWallThing>(*element->thing, position);
+				App::DoCommand(*m_command);
+			}
+		}
+
 	}
 	else
 	{
 		using Opt = HitTester::Option;
-		m_overState = HitTest(logPoint, nullptr, { Opt::Verts, Opt::EdgePoints });
+		m_overState = HitTest(logPoint, nullptr, { Opt::Verts, Opt::EdgePoints, Opt::WallThings });
 	}
 }
 
@@ -108,30 +126,30 @@ void SelectTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 		auto* save = command.get();
 		App::AddCommand(std::move(command));
 
+		m_overState = std::make_unique<Model::VertElement>(element->object, save->GetNewVert());
 		vert = save->GetNewVert();
 	}
+	
 	if (auto* element = m_overState->GetAs<Model::VertElement>())
 	{
-		vert = element->vert;
+		if (element->vert != App::GetSelection().GetVert())
+		{
+			Model::Selection selection;
+			if (element->vert)
+				selection = Model::Selection(*m_overState->GetObject(), *element->vert);
+
+			App::SetSelection(selection);
+		}
 	}
 
-	if (vert != App::GetSelection().GetVert())
-	{
-		Model::Selection selection;
-		if (vert)
-			selection = Model::Selection(*m_overState->GetObject(), *vert);
-
-		App::SetSelection(selection);
-	}
-
-	m_dragVert = vert;
+	m_dragging = m_overState != nullptr;
 }
 
 void SelectTool::OnMouseUp(sf::Mouse::Button button, const sf::Vector2i & point)
 {
 	Kernel::Log() << "SelectTool::OnMouseUp dev=" << point << std::endl;
 
-	m_dragVert = nullptr;
+	m_dragging = false;
 
 	if (m_command)
 		App::AddCommand(std::move(m_command), true);

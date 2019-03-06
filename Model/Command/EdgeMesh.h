@@ -26,7 +26,7 @@ namespace GMT::Model::Command
 		virtual void Undo(CommandContext& ctx) override;
 		virtual void Redo(CommandContext& ctx) override;
 
-		void UndoNoUpdate();
+		virtual void UndoNoUpdate() override;
 
 	protected:
 		Jig::EdgeMesh& GetMesh() const;

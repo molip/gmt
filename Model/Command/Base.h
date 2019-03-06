@@ -40,6 +40,7 @@ namespace GMT::Model::Command
 		virtual void Do(CommandContext& ctx) = 0;
 		virtual void Undo(CommandContext& ctx) = 0;
 		virtual void Redo(CommandContext& ctx) { Do(ctx); }
+		virtual void UndoNoUpdate() {}
 	};
 
 	using BasePtr = std::unique_ptr<Base>;

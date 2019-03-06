@@ -98,6 +98,7 @@
     <ClCompile Include="Model\Command\DeleteWallThing.cpp" />
     <ClCompile Include="Model\Command\EdgeMesh.cpp" />
     <ClCompile Include="Model\Command\MergeFace.cpp" />
+    <ClCompile Include="Model\Command\MoveWallThing.cpp" />
     <ClCompile Include="Model\ImageObject.cpp" />
     <ClCompile Include="Model\Model.cpp" />
     <ClCompile Include="Model\Notification.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="Model\Command\DeleteWallThing.h" />
     <ClInclude Include="Model\Command\EdgeMesh.h" />
     <ClInclude Include="Model\Command\MergeFace.h" />
+    <ClInclude Include="Model\Command\MoveWallThing.h" />
     <ClInclude Include="Model\Element.h" />
     <ClInclude Include="Model\ImageObject.h" />
     <ClInclude Include="Model\Model.h" />

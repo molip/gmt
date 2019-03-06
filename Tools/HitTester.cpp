@@ -11,7 +11,7 @@
 using namespace GMT;
 using namespace GMT::Tools;
 
-HitTester::HitTester(const MainView& view, const Options& opts) : m_view(view), m_opts(opts)
+HitTester::HitTester(const MainView& view, const Options& opts, float orthThreshold) : m_view(view), m_opts(opts), m_orthThreshold(orthThreshold)
 {
 }
 
@@ -19,8 +19,7 @@ Model::ElementPtr HitTester::HitTest(const sf::Vector2f& logPoint, const Model::
 {
 	const auto objectPoint = m_view.GetGrid().GetGridPoint(logPoint);
 
-	const float orthThreshold = m_opts[Option::InternalEdges] ? 0.25f : 0.5f;
-	const float threshold = std::sqrtf(orthThreshold * orthThreshold * 2);
+	const float threshold = std::sqrtf(m_orthThreshold * m_orthThreshold * 2);
 	Kernel::MinFinder<Model::ElementPtr, float> minFinder(threshold * threshold);
 
 	if (m_opts[Option::EdgePoints] || m_opts[Option::Verts] || m_opts[Option::InternalEdges] || m_opts[Option::Edges])

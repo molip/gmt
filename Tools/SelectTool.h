@@ -2,9 +2,14 @@
 
 #include "Tool.h"
 
+namespace GMT::Model
+{
+	class WallThing;
+}
+
 namespace GMT::Model::Command
 {
-	class EdgeMesh;
+	class Base;
 }
 
 namespace GMT::Tools
@@ -26,7 +31,7 @@ namespace GMT::Tools
 
 		Model::ElementPtr m_overState;
 
-		const Jig::EdgeMesh::Vert* m_dragVert {};
-		std::unique_ptr<Model::Command::EdgeMesh> m_command;
+		bool m_dragging{};
+		std::unique_ptr<Model::Command::Base> m_command;
 	};
 }

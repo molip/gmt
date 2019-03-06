@@ -21,13 +21,13 @@ namespace GMT::Tools
 		enum class Option { Verts, EdgePoints, Edges, InternalEdges, Faces, Grid, WallThings, _Count };
 		using Options = Kernel::EnumBitset<Option>;
 
-		HitTester(const MainView& view, const Options& opts);
+		HitTester(const MainView& view, const Options& opts, float orthThreshold = 0);
 
 		Model::ElementPtr HitTest(const sf::Vector2f& logPoint, const Model::VectorObject* special) const;
 
 	protected:
 		using MinFinder = Kernel::MinFinder<Model::ElementPtr, float>;
-		struct Priority { enum Type { Grid, Face, Edge, WallThing, Vert }; };
+		struct Priority { enum Type { Grid, Face, Edge, Vert, WallThing }; };
 
 		void HitTestObject(const Model::VectorObject& object, const sf::Vector2f& point, MinFinder& minFinder, float threshold) const;
 		void HitTestEdge(const Model::VectorObject& object, const sf::Vector2f& point, const Jig::EdgeMesh::Edge& edge, const Jig::EdgeMesh::Edge& nextEdge, MinFinder& minFinder, float threshold) const;
@@ -41,5 +41,6 @@ namespace GMT::Tools
 
 		const MainView& m_view;
 		const Options m_opts;
+		float m_orthThreshold;
 	};
 }

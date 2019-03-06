@@ -30,7 +30,7 @@ namespace GMT::Tools
 		virtual void Update() {}
 
 	protected:
-		Model::ElementPtr HitTest(const sf::Vector2f& logPoint, const Model::VectorObject* special, const HitTester::Options& opts) const;
+		Model::ElementPtr HitTest(const sf::Vector2f& logPoint, const Model::VectorObject* special, const HitTester::Options& opts, bool threshold = true) const;
 
 		const MainView& m_view;
 	};
