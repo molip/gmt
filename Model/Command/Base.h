@@ -35,6 +35,8 @@ namespace GMT::Model::Command
 			SelectionPtr m_newSelection;
 		};
 
+		virtual bool CanDo() const { return true; }
+
 		virtual void Do(CommandContext& ctx) = 0;
 		virtual void Undo(CommandContext& ctx) = 0;
 		virtual void Redo(CommandContext& ctx) { Do(ctx); }

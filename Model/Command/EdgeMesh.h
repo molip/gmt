@@ -20,7 +20,7 @@ namespace GMT::Model::Command
 		EdgeMesh(Ptr command, const VectorObject& object);
 		EdgeMesh(Jig::EdgeMeshCommand::Compound::Vec&& commands, const VectorObject& object);
 
-		bool CanDo() const { return m_command && m_command->CanDo(); }
+		virtual bool CanDo() const { return m_command && m_command->CanDo(); }
 
 		virtual void Do(CommandContext& ctx) override;
 		virtual void Undo(CommandContext& ctx) override;

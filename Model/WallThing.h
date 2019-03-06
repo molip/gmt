@@ -30,6 +30,8 @@ namespace GMT::Model
 		const Position& GetPosition() const { return m_position; }
 		void SetPosition(const Position& pos) { m_position = pos; }
 
+		Jig::Vec2 GetPoint() const;
+
 		void ToggleFlipped() { m_flipped = !m_flipped; }
 
 		void Load(const Kernel::Serial::LoadNode& node);
@@ -47,7 +49,12 @@ namespace GMT::Model
 	public:
 		using ThingVec = std::vector<WallThingPtr>;
 
-		void Add(std::unique_ptr<WallThing> thing) { m_things.push_back(std::move(thing)); }
+		ThingVec::const_iterator begin() const { return m_things.begin(); }
+		ThingVec::const_iterator end() const { return m_things.end(); }
+
+		WallThing& Insert(WallThingPtr thing, int index = -1);
+		std::pair<WallThingPtr, int> Remove(const WallThing& thing);
+		WallThingPtr Remove(int index = -1);
 		bool EdgeHasThing(const Jig::EdgeMesh::Edge& edge) const;
 		void Draw(RenderContext& rc) const;
 

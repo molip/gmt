@@ -75,6 +75,15 @@
     <ClCompile Include="Model\WallThingOp.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="Tools\AddWallThingTool.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Command\AddWallThing.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Command\DeleteWallThing.cpp">
+      <Filter>Model\Command</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -146,6 +155,15 @@
     </ClInclude>
     <ClInclude Include="Model\WallThingOp.h">
       <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\AddWallThingTool.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\AddWallThing.h">
+      <Filter>Model\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Command\DeleteWallThing.h">
+      <Filter>Model\Command</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

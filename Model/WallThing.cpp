@@ -11,13 +11,16 @@ using namespace GMT::Model;
 
 void WallThing::Draw(RenderContext& rc) const
 {
-	Jig::Vec2 v = m_position.edge->GetVec();
-	Jig::Vec2 p = *m_position.edge->vert + v * m_position.dist + Jig::Vec2(-v.y, v.x).Normalised() * 0.2;
-
 	sf::CircleShape circle(10);
 	circle.setFillColor(sf::Color::Magenta);
-	circle.setPosition(rc.GetGrid().GetPoint(sf::Vector2f(p)) - sf::Vector2f(10, 10));
+	circle.setPosition(rc.GetGrid().GetPoint(sf::Vector2f(GetPoint())) - sf::Vector2f(10, 10));
 	rc.GetWindow().draw(circle);
+}
+
+Jig::Vec2 WallThing::GetPoint() const
+{
+	const Jig::Vec2 v = m_position.edge->GetVec();
+	return *m_position.edge->vert + v * m_position.dist;// +Jig::Vec2(-v.y, v.x).Normalised() * 0.2;
 }
 
 void WallThing::Load(const Kernel::Serial::LoadNode& node)
@@ -35,6 +38,29 @@ void WallThing::Save(Kernel::Serial::SaveNode& node) const
 }
 
 
+WallThing& WallThings::Insert(WallThingPtr thing, int index)
+{
+	m_things.insert(index >= 0 ? m_things.begin() + index : m_things.end(), std::move(thing));
+	return *m_things.back();
+}
+
+WallThingPtr WallThings::Remove(int index)
+{
+	auto it = index >= 0 ? m_things.begin() + index : m_things.end() - 1;
+	WallThingPtr thing = std::move(*it);
+	m_things.erase(it);
+	return thing;
+}
+
+std::pair<WallThingPtr, int> WallThings::Remove(const WallThing& thing)
+{
+	auto it = std::find_if(m_things.begin(), m_things.end(), [&](auto& item) { return item.get() == &thing; });
+	if (it == m_things.end())
+		return { nullptr, -1 };
+	
+	const int index = int(it - m_things.begin());
+	return { Remove(index), index };
+}
 
 bool WallThings::EdgeHasThing(const Jig::EdgeMesh::Edge& edge) const
 {

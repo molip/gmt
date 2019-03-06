@@ -1,5 +1,7 @@
 #pragma once
 
+#include "WallThing.h"
+
 #include "Jig/EdgeMesh.h"
 
 namespace GMT::Model
@@ -63,5 +65,15 @@ namespace GMT::Model
 		virtual const VectorObject* GetObject() const override { return object; }
 		const VectorObject* object{};
 		const Jig::EdgeMesh::Face* face{};
+	};
+
+	class WallThingElement : public Element
+	{
+	public:
+		WallThingElement(const VectorObject* object, const WallThing* thing) : object(object), thing(thing) {}
+		virtual const VectorObject* GetObject() const override { return object; }
+		virtual Jig::Vec2f GetPoint() const { return Jig::Vec2f(thing->GetPoint()); }
+		const VectorObject* object{};
+		const WallThing* thing{};
 	};
 }

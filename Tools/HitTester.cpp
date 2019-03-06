@@ -113,4 +113,8 @@ void HitTester::HitTestObject(const Model::VectorObject& object, const sf::Vecto
 				HitTestEdgeLoop(object, point, object.GetMesh().GetOuterEdges(), minFinder, threshold);
 		}
 	}
+
+	if (m_opts[Option::WallThings])
+		for (auto& thing : object.GetWallThings())
+			minFinder.Try(std::make_shared<Model::WallThingElement>(&object, thing.get()), (float)(Jig::Vec2(Jig::Vec2(point) - thing->GetPoint()).GetLengthSquared()), Priority::WallThing);
 }

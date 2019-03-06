@@ -91,9 +91,11 @@
     <ClCompile Include="Model\Command\AddObject.cpp" />
     <ClCompile Include="Model\Command\AddVert.cpp" />
     <ClCompile Include="Model\Command\AddWall.cpp" />
+    <ClCompile Include="Model\Command\AddWallThing.cpp" />
     <ClCompile Include="Model\Command\Base.cpp" />
     <ClCompile Include="Model\Command\DeleteFace.cpp" />
     <ClCompile Include="Model\Command\DeleteVert.cpp" />
+    <ClCompile Include="Model\Command\DeleteWallThing.cpp" />
     <ClCompile Include="Model\Command\EdgeMesh.cpp" />
     <ClCompile Include="Model\Command\MergeFace.cpp" />
     <ClCompile Include="Model\ImageObject.cpp" />
@@ -105,6 +107,7 @@
     <ClCompile Include="Model\WallThing.cpp" />
     <ClCompile Include="Model\WallThingOp.cpp" />
     <ClCompile Include="RenderContext.cpp" />
+    <ClCompile Include="Tools\AddWallThingTool.cpp" />
     <ClCompile Include="Tools\HitTester.cpp" />
     <ClCompile Include="Tools\DeleteTool.cpp" />
     <ClCompile Include="Tools\SelectTool.cpp" />
@@ -123,9 +126,11 @@
     <ClInclude Include="Model\Command\AddObject.h" />
     <ClInclude Include="Model\Command\AddVert.h" />
     <ClInclude Include="Model\Command\AddWall.h" />
+    <ClInclude Include="Model\Command\AddWallThing.h" />
     <ClInclude Include="Model\Command\Base.h" />
     <ClInclude Include="Model\Command\DeleteFace.h" />
     <ClInclude Include="Model\Command\DeleteVert.h" />
+    <ClInclude Include="Model\Command\DeleteWallThing.h" />
     <ClInclude Include="Model\Command\EdgeMesh.h" />
     <ClInclude Include="Model\Command\MergeFace.h" />
     <ClInclude Include="Model\Element.h" />
@@ -138,6 +143,7 @@
     <ClInclude Include="Model\WallThing.h" />
     <ClInclude Include="Model\WallThingOp.h" />
     <ClInclude Include="RenderContext.h" />
+    <ClInclude Include="Tools\AddWallThingTool.h" />
     <ClInclude Include="Tools\HitTester.h" />
     <ClInclude Include="Tools\DeleteTool.h" />
     <ClInclude Include="Tools\SelectTool.h" />
