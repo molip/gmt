@@ -18,7 +18,7 @@ namespace GMT::Tools
 	class HitTester
 	{
 	public:
-		enum class Option { Verts, EdgePoints, InternalEdges, Faces, Grid, WallThings, _Count };
+		enum class Option { Verts, EdgePoints, Edges, InternalEdges, Faces, Grid, WallThings, _Count };
 		using Options = Kernel::EnumBitset<Option>;
 
 		HitTester(const MainView& view, const Options& opts);

@@ -62,7 +62,7 @@ void SelectTool::Draw(RenderContext& rc) const
 		if (m_overState)
 		{
 			const sf::Color colour = m_overState->GetAs<Model::VertElement>() ? sf::Color::Yellow : sf::Color::Blue;
-			drawCircle(m_overState->GetPoint(), BigDotRadius, colour);
+			drawCircle(m_overState->GetPointF(), BigDotRadius, colour);
 		}
 	}
 }
@@ -102,9 +102,9 @@ void SelectTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 
 	const Jig::EdgeMesh::Vert* vert{};
 
-	if (auto* element = m_overState->GetAs<Model::EdgePointElement>())
+	if (auto* element = m_overState->GetAs<Model::EdgeElement>())
 	{
-		auto command = std::make_unique<Model::Command::AddVert>(*element->edge, element->point, *element->object);
+		auto command = std::make_unique<Model::Command::AddVert>(*element->edge, element->GetPoint(), *element->object);
 		auto* save = command.get();
 		App::AddCommand(std::move(command));
 

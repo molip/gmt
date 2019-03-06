@@ -49,25 +49,25 @@ void VectorTool::Draw(RenderContext& rc) const
 	}
 
 	if (!m_points.empty() && m_overState)
-		verts.append(sf::Vertex(rc.GetGrid().GetPoint(m_overState->GetPoint()), sf::Color::Green));
+		verts.append(sf::Vertex(rc.GetGrid().GetPoint(m_overState->GetPointF()), sf::Color::Green));
 
 	rc.GetWindow().draw(verts);
 
 	if (m_overState)
 	{
 		auto colour =
-			m_overState->GetAs<Model::EdgePointElement>() ? sf::Color::Blue :
+			m_overState->GetAs<Model::EdgeElement>() ? sf::Color::Blue :
 			m_overState->GetAs<Model::VertElement>() ? sf::Color::Yellow :
 			IsClosed() ? sf::Color::Green :
 			sf::Color::Red;
 	
-		drawCircle(m_overState->GetPoint(), BigDotRadius, colour);
+		drawCircle(m_overState->GetPointF(), BigDotRadius, colour);
 	}
 }
 
 bool VectorTool::IsClosed() const
 {
-	return m_points.size() >= 3 && m_overState && m_overState->GetPoint() == m_points.front();
+	return m_points.size() >= 3 && m_overState && m_overState->GetPointF() == m_points.front();
 }
 
 void VectorTool::OnMouseMoved(const sf::Vector2i& point)
@@ -134,7 +134,7 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 	}
 	else if (m_objectEdit)
 	{
-		if (finished = m_overState->GetAs<Model::EdgePointElement>() || m_overState->GetAs<Model::VertElement>())
+		if (finished = m_overState->GetAs<Model::EdgeElement>() || m_overState->GetAs<Model::VertElement>())
 		{
 			m_points.erase(m_points.begin());
 			
@@ -161,7 +161,7 @@ void VectorTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & poin
 	}
 
 	if (!finished && m_overState)
-		m_points.push_back(m_overState->GetPoint());
+		m_points.push_back(m_overState->GetPointF());
 }
 
 void VectorTool::OnKeyPressed(const sf::Event::KeyEvent event)

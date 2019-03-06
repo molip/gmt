@@ -59,20 +59,23 @@ AddWall::Verts AddWall::GetVerts(NewVertVec* newVerts) const
 		return verts;
 	};
 
-	auto* startEdgeTerm = m_start->GetAs<EdgePointElement>();
-	auto* endEdgeTerm = m_end->GetAs<EdgePointElement>();
+	auto* startEdgeTerm = m_start->GetAs<EdgeElement>();
+	auto* endEdgeTerm = m_end->GetAs<EdgeElement>();
 
-	if (startEdgeTerm && endEdgeTerm && startEdgeTerm->edge == endEdgeTerm->edge || startEdgeTerm->edge == endEdgeTerm->edge->twin) // Same edge! 
+	if (startEdgeTerm && endEdgeTerm)
 	{
-		const auto& edge = *startEdgeTerm->edge;
+		const bool sameEdge = startEdgeTerm->edge == endEdgeTerm->edge;
+		const bool twins = startEdgeTerm->edge == endEdgeTerm->edge->twin;
 
-		// Sort by position along edge.
-		const bool swap = Jig::Vec2(endEdgeTerm->point - *edge.vert).GetLengthSquared() <
-			Jig::Vec2(startEdgeTerm->point - *edge.vert).GetLengthSquared();
-
-		std::vector<const EdgePointElement*> terms{ startEdgeTerm, endEdgeTerm };
-		auto verts = insertVerts(edge, { terms[swap]->point, terms[!swap]->point });
-		return { verts[swap], verts[!swap], std::move(compound) };
+		if (sameEdge || twins)
+		{
+			// Insert verts in order of position along start edge, but return {start, end}.
+			const double endNormalisedDist = twins ? 1 - endEdgeTerm->normalisedDist : endEdgeTerm->normalisedDist; 
+			const bool swap = endNormalisedDist < startEdgeTerm->normalisedDist;
+			std::vector<const EdgeElement*> terms{ startEdgeTerm, endEdgeTerm };
+			auto verts = insertVerts(*startEdgeTerm->edge, { terms[swap]->GetPoint(), terms[!swap]->GetPoint() });
+			return { verts[swap], verts[!swap], std::move(compound) };
+		}
 	}
 
 	auto getVert = [&](const Element& term)
@@ -81,8 +84,8 @@ AddWall::Verts AddWall::GetVerts(NewVertVec* newVerts) const
 
 		if (auto* vertTerm = term.GetAs<VertElement>())
 			result = const_cast<Jig::EdgeMesh::Vert*>(vertTerm->vert);
-		else if (auto* edgeTerm = term.GetAs<EdgePointElement>())
-			result = insertVerts(*edgeTerm->edge, { edgeTerm->point }).front();
+		else if (auto* edgeTerm = term.GetAs<EdgeElement>())
+			result = insertVerts(*edgeTerm->edge, { edgeTerm->GetPoint() }).front();
 
 		return result;
 	};

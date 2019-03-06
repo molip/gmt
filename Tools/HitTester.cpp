@@ -23,7 +23,7 @@ Model::ElementPtr HitTester::HitTest(const sf::Vector2f& logPoint, const Model::
 	const float threshold = std::sqrtf(orthThreshold * orthThreshold * 2);
 	Kernel::MinFinder<Model::ElementPtr, float> minFinder(threshold * threshold);
 
-	if (m_opts[Option::EdgePoints] || m_opts[Option::Verts] || m_opts[Option::InternalEdges])
+	if (m_opts[Option::EdgePoints] || m_opts[Option::Verts] || m_opts[Option::InternalEdges] || m_opts[Option::Edges])
 	{
 		if (special)
 			HitTestObject(*special, objectPoint, minFinder, threshold);
@@ -61,8 +61,8 @@ void HitTester::HitTestEdge(const Model::VectorObject& object, const sf::Vector2
 	double dist{};
 	if (line.PerpIntersect(point, &dist, &intersect))
 	{
-		if (m_opts[Option::InternalEdges] && edge.twin)
-			minFinder.Try(std::make_shared<Model::EdgeElement>(&object, &edge), float(dist * dist), Priority::Edge);
+		if (m_opts[Option::Edges] || m_opts[Option::InternalEdges] && edge.twin)
+			minFinder.Try(std::make_shared<Model::EdgeElement>(&object, &edge, intersect), float(dist * dist), Priority::Edge);
 
 		if (m_opts[Option::EdgePoints])
 		{
@@ -72,7 +72,7 @@ void HitTester::HitTestEdge(const Model::VectorObject& object, const sf::Vector2
 				if (x > bbox.m_p0.x && x < bbox.m_p1.x && !Kernel::fcomp(x, line.GetP0().x) && !Kernel::fcomp(x, line.GetP1().x))
 				{
 					const Jig::Vec2 snapped(x, intersect.y + (x - intersect.x) * line.GetGradient());
-					minFinder.Try(std::make_shared<Model::EdgePointElement>(&object, &edge, snapped), Jig::Vec2f(Jig::Vec2f(snapped) - point).GetLengthSquared(), Priority::Vert);
+					minFinder.Try(std::make_shared<Model::EdgeElement>(&object, &edge, snapped), Jig::Vec2f(Jig::Vec2f(snapped) - point).GetLengthSquared(), Priority::Vert);
 				}
 			}
 
@@ -83,7 +83,7 @@ void HitTester::HitTestEdge(const Model::VectorObject& object, const sf::Vector2
 				{
 					double dx = line.IsVertical() ? 0 : (y - intersect.y) / line.GetGradient();
 					const Jig::Vec2 snapped(intersect.x + dx, y);
-					minFinder.Try(std::make_shared<Model::EdgePointElement>(&object, &edge, snapped), Jig::Vec2f(Jig::Vec2f(snapped) - point).GetLengthSquared(), Priority::Vert);
+					minFinder.Try(std::make_shared<Model::EdgeElement>(&object, &edge, snapped), Jig::Vec2f(Jig::Vec2f(snapped) - point).GetLengthSquared(), Priority::Vert);
 				}
 			}
 		}
@@ -96,7 +96,7 @@ void HitTester::HitTestObject(const Model::VectorObject& object, const sf::Vecto
 		if (auto* vert = object.GetMesh().FindNearestVert(point, threshold))
 			minFinder.Try(std::make_shared<Model::VertElement>(&object, vert), (float)(Jig::Vec2(Jig::Vec2(point) - *vert).GetLengthSquared()), Priority::Vert);
 
-	const bool edges = m_opts[Option::EdgePoints] || m_opts[Option::InternalEdges];
+	const bool edges = m_opts[Option::EdgePoints] || m_opts[Option::InternalEdges] || m_opts[Option::Edges];
 
 	if (edges || m_opts[Option::Faces])
 	{

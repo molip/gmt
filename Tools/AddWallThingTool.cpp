@@ -44,7 +44,7 @@ void AddWallThingTool::Draw(RenderContext& rc) const
 
 	if (m_overState)
 	{
-		drawCircle(m_overState->GetPoint(), BigDotRadius, sf::Color::Magenta);
+		drawCircle(m_overState->GetPointF(), BigDotRadius, sf::Color::Magenta);
 	}
 }
 
@@ -56,7 +56,7 @@ void AddWallThingTool::OnMouseMoved(const sf::Vector2i& point)
 void AddWallThingTool::Update(const sf::Vector2f& logPoint)
 {
 	using Opt = HitTester::Option;
-	m_overState = HitTest(logPoint, nullptr, { Opt::EdgePoints });
+	m_overState = HitTest(logPoint, nullptr, { Opt::Edges });
 }
 
 void AddWallThingTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i & point)
@@ -64,11 +64,9 @@ void AddWallThingTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i 
 	if (!m_overState)
 		return;
 
-	auto* element = m_overState->GetAs<Model::EdgePointElement>();
+	auto* element = m_overState->GetAs<Model::EdgeElement>();
 	auto thing = std::make_unique<Model::WallThing>();
-	thing->SetPosition({ element->edge, Jig::Vec2(element->point - *element->edge->vert).GetLength() / element->edge->GetVec().GetLength() });
-
-
+	thing->SetPosition({ element->edge, element->normalisedDist });
 
 	auto command = std::make_unique<Model::Command::AddWallThing>(*element->object, std::move(thing));
 	App::AddCommand(std::move(command));
