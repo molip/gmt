@@ -6,8 +6,8 @@ using namespace GMT::Model::Command;
 
 AddVert::AddVert(const Jig::EdgeMesh::Edge& edge, const Jig::Vec2& position, const VectorObject& object) : EdgeMesh(object)
 {
-	auto command = std::make_unique<Jig::EdgeMeshCommand::InsertVert>(GetMesh(), const_cast<Jig::EdgeMesh::Edge&>(edge), position);
-	m_vert = command->GetVert();
+	auto command = std::make_unique<Jig::EdgeMeshCommand::InsertVerts>(GetMesh(), const_cast<Jig::EdgeMesh::Edge&>(edge), position);
+	m_vert = command->GetVerts().front().get();
 	m_command = std::move(command);
 }
 

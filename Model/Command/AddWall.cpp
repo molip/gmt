@@ -44,41 +44,35 @@ AddWall::Verts AddWall::GetVerts(NewVertVec* newVerts) const
 {
 	auto compound = std::make_unique<Jig::EdgeMeshCommand::Compound>();
 
-	auto insertVert = [&](const EdgePointElement& term)
+	auto insertVerts = [&](const Jig::EdgeMesh::Edge& edge, std::initializer_list<Jig::Vec2> positions)
 	{
-		auto command = std::make_unique<Jig::EdgeMeshCommand::InsertVert>(GetMesh(), const_cast<Jig::EdgeMesh::Edge&>(*term.edge), term.point);
-		auto* vert = command->GetVert();
+		auto command = std::make_unique<Jig::EdgeMeshCommand::InsertVerts>(GetMesh(), const_cast<Jig::EdgeMesh::Edge&>(edge), positions);
+		std::vector<Jig::EdgeMesh::Vert*> verts;
+		for (auto& vert : command->GetVerts())
+			verts.push_back(vert.get());
+
 		if (newVerts)
-			newVerts->push_back(vert);
+			newVerts->insert(newVerts->end(), verts.begin(), verts.end());
 
 		compound->AddChild(std::move(command));
-		return vert;
+
+		return verts;
 	};
 
 	auto* startEdgeTerm = m_start->GetAs<EdgePointElement>();
 	auto* endEdgeTerm = m_end->GetAs<EdgePointElement>();
 
-	if (startEdgeTerm && endEdgeTerm && startEdgeTerm->edge == endEdgeTerm->edge) // Same edge! 
+	if (startEdgeTerm && endEdgeTerm && startEdgeTerm->edge == endEdgeTerm->edge || startEdgeTerm->edge == endEdgeTerm->edge->twin) // Same edge! 
 	{
-		Jig::EdgeMesh::Vert* startVert{};
-		Jig::EdgeMesh::Vert* endVert{};
+		const auto& edge = *startEdgeTerm->edge;
 
-		// We have to do the one nearest the vert first. 
-		std::vector<std::pair<Jig::EdgeMesh::Vert**, const EdgePointElement*>> vec;
-		vec = { { &startVert, startEdgeTerm },{ &endVert, endEdgeTerm } };
+		// Sort by position along edge.
+		const bool swap = Jig::Vec2(endEdgeTerm->point - *edge.vert).GetLengthSquared() <
+			Jig::Vec2(startEdgeTerm->point - *edge.vert).GetLengthSquared();
 
-		std::sort(vec.begin(), vec.end(), [&](auto& lhs, auto& rhs)
-		{
-			auto& lhsTerm = *lhs.second;
-			auto& rhsTerm = *rhs.second;
-			return Jig::Vec2(lhsTerm.point - *lhsTerm.edge->vert).GetLengthSquared() < 
-				Jig::Vec2(rhsTerm.point - *rhsTerm.edge->vert).GetLengthSquared();
-		});
-
-		for (auto&[vert, term] : vec)
-			*vert = insertVert(*term);
-
-		return { startVert, endVert, std::move(compound) };
+		std::vector<const EdgePointElement*> terms{ startEdgeTerm, endEdgeTerm };
+		auto verts = insertVerts(edge, { terms[swap]->point, terms[!swap]->point });
+		return { verts[swap], verts[!swap], std::move(compound) };
 	}
 
 	auto getVert = [&](const Element& term)
@@ -88,7 +82,7 @@ AddWall::Verts AddWall::GetVerts(NewVertVec* newVerts) const
 		if (auto* vertTerm = term.GetAs<VertElement>())
 			result = const_cast<Jig::EdgeMesh::Vert*>(vertTerm->vert);
 		else if (auto* edgeTerm = term.GetAs<EdgePointElement>())
-			result = insertVert(*edgeTerm);
+			result = insertVerts(*edgeTerm->edge, { edgeTerm->point }).front();
 
 		return result;
 	};
