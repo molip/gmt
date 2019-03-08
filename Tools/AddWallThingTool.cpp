@@ -65,7 +65,7 @@ void AddWallThingTool::OnMouseDown(sf::Mouse::Button button, const sf::Vector2i 
 		return;
 
 	auto* element = m_overState->GetAs<Model::EdgeElement>();
-	auto thing = std::make_unique<Model::WallThing>();
+	auto thing = std::make_unique<Model::Door>();
 	thing->SetPosition({ element->edge, element->normalisedDist });
 
 	auto command = std::make_unique<Model::Command::AddWallThing>(*element->object, std::move(thing));

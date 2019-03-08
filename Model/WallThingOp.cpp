@@ -9,7 +9,10 @@ void WallThingOp::AddMove(size_t index, const WallThing::Position& position, boo
 	m_moves.push_back(std::make_unique<Move>(thing.get(), thing->GetPosition(), flip));
 	thing->SetPosition(position);
 	if (flip)
+	{
+		KERNEL_ASSERT(thing->CanFlip());
 		thing->ToggleFlipped();
+	}
 }
 
 void WallThingOp::AddFlip(size_t index)
@@ -122,7 +125,7 @@ void WallThingOp::DeletedFace(const Jig::EdgeMesh::Face& face)
 	for (auto& edge : face.GetEdges())
 		for (int i = int(m_things.size()) - 1; i >= 0; --i)
 			if (m_things[i]->GetPosition().edge == &edge)
-				if (edge.twin)
+				if (edge.twin && m_things[i]->CanFlip())
 					AddFlip(i);
 				else
 					AddDelete(i);

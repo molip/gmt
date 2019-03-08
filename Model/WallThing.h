@@ -4,6 +4,11 @@
 
 #include <vector>
 
+namespace sf
+{
+	class Texture;
+}
+
 namespace GMT
 {
 	class RenderContext;
@@ -14,7 +19,7 @@ namespace GMT::Model
 	class WallThingOp;
 	using WallThingOpPtr = std::unique_ptr<WallThingOp>;
 
-	class WallThing
+	class WallThing : public Kernel::Dynamic
 	{
 	public:
 		class Position
@@ -25,23 +30,36 @@ namespace GMT::Model
 		};
 
 		WallThing(const Jig::EdgeMesh::Edge* edge = nullptr) : m_position{ edge } {}
-		void Draw(RenderContext& rc) const;
+
+		virtual void Draw(RenderContext& rc) const = 0;
+		virtual bool IsSurface() const { return true; }
 
 		const Position& GetPosition() const { return m_position; }
 		void SetPosition(const Position& pos) { m_position = pos; }
 
 		Jig::Vec2 GetPoint() const;
 
+		bool CanFlip() const { return !IsSurface(); }
 		void ToggleFlipped() { m_flipped = !m_flipped; }
 
 		void Load(const Kernel::Serial::LoadNode& node);
 		void Save(Kernel::Serial::SaveNode& node) const;
 
-	private:
+	protected:
 		Position m_position;
 		bool m_flipped{};
 	};
 	using WallThingPtr = std::unique_ptr<WallThing>;
+
+	class Door : public WallThing
+	{
+	public:
+		Door();
+		virtual void Draw(RenderContext& rc) const override;
+		virtual bool IsSurface() const { return false; }
+	private:
+		std::unique_ptr<sf::Texture> m_texture;
+	};
 
 	class WallThings
 	{

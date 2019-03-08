@@ -145,9 +145,15 @@ void MainView::OnKeyPressed(const sf::Event::KeyEvent event)
 			App::Save();
 	}
 	else if (event.control && event.code == sf::Keyboard::O)
+	{
 		App::Load();
+		m_tool->Update();
+	}
 	else if (event.control && event.code == sf::Keyboard::N)
+	{
 		App::New();
+		m_tool->Update();
+	}
 	else if (event.code == sf::Keyboard::F1)
 		m_tool = std::make_unique<Tools::SelectTool>(*this);
 	else if (event.code == sf::Keyboard::F2)
