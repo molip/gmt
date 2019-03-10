@@ -37,41 +37,41 @@ void WallThingOp::Undo()
 	}
 }
 
-void WallThingOp::AddedVert(const Jig::EdgeMesh::Edge& edge)
+void WallThingOp::AddedVert(const Jig::EdgeMesh::Edge& edge, int count)
 {
-	auto f = [&](int index, double vertDist)
-	{
-		auto& thing = m_things[index];
+	KERNEL_ASSERT(count >= 1);
 
-		double newDist{};
-		double oldDist = thing->GetPosition().dist;
-		auto* newEdge = thing->GetPosition().edge;
+	const Jig::EdgeMesh::Edge* oldNext = edge.next->next;
+	for (int i = 1; i < count; ++i)
+		oldNext = oldNext->next;
 
-
-		if (oldDist <= vertDist)
-		{
-			newDist = oldDist / vertDist;
-		}
-		else
-		{
-			newDist = (oldDist - vertDist) / (1 - vertDist);
-			newEdge = newEdge->next;
-		}
-
-		AddMove(index, WallThing::Position{ newEdge, newDist });
-	};
-
-	const double oldLength = Jig::Vec2(*edge.next->next->vert - *edge.vert).GetLength();
-	const double newLength = Jig::Vec2(*edge.next->vert - *edge.vert).GetLength();
-	const double newVertDist = newLength / oldLength;
+	const double oldLength = Jig::Vec2(*oldNext->vert - *edge.vert).GetLength();
 
 	for (int i = 0; i < m_things.size(); ++i)
 	{
-		if (m_things[i]->GetPosition().edge == &edge)
-			f(i, newVertDist);
+		auto& thing = m_things[i];
+		const auto* thingEdge = thing->GetPosition().edge;
+		if (thingEdge != &edge && thingEdge != oldNext->prev->twin)
+			continue;
 
-		if (m_things[i]->GetPosition().edge == edge.next->twin) // Thing on edge's old twin.
-			f(i, 1 - newVertDist); 
+		double remain = thing->GetPosition().dist * oldLength; // Chop until it fits on an edge.
+		auto* newEdge = thing->GetPosition().edge;
+		double newDist{};
+
+		while (true)
+		{
+			double newEdgeLength = newEdge->GetVec().GetLength();
+			if (remain < newEdgeLength)
+			{
+				newDist = remain / newEdgeLength;
+				break;
+			}
+
+			newEdge = newEdge->next;
+			remain -= newEdgeLength;
+		}
+
+		AddMove(i, WallThing::Position{ newEdge, newDist });
 	}
 }
 

@@ -20,15 +20,27 @@ namespace GMT::Model::Command
 		bool CanDo() const;
 
 	private:
-		using CompoundPtr = std::unique_ptr<Jig::EdgeMeshCommand::Compound>;
-		using Verts = std::tuple<Jig::EdgeMesh::Vert*, Jig::EdgeMesh::Vert*, CompoundPtr>;
-		using NewVertVec = std::vector<const Jig::EdgeMesh::Vert*>;
+		using Verts = std::pair<Jig::EdgeMesh::Vert*, Jig::EdgeMesh::Vert*>;
+		using NewVertVec = std::vector<Jig::EdgeMesh::Vert*>;
+		using ModifiedEdge = std::pair<const Jig::EdgeMesh::Edge*, NewVertVec>;
+		using ModifiedEdges = std::vector<ModifiedEdge>;
 
-		Verts GetVerts(NewVertVec* newVerts) const;
-			
+		class UpdateWallThingsCommand : public Jig::EdgeMeshCommand::Base
+		{
+		public:
+			UpdateWallThingsCommand(const VectorObject& object, const ModifiedEdges& modifiedEdges) : m_object(object), m_modifiedEdges(modifiedEdges) {}
+			virtual void Do() override;
+			virtual void Undo() override;
+		private:
+			const VectorObject& m_object;
+			ModifiedEdges m_modifiedEdges;
+			std::vector<WallThingOpPtr> m_ops;
+		};
+
+		Verts GetVerts(Jig::EdgeMeshCommand::Compound& compound, ModifiedEdges* modifiedEdges) const;
+
 		ElementPtr m_start, m_end;
 		Jig::PolyLine m_points;
-
 		NewVertVec m_newVerts;
 	};
 }

@@ -74,10 +74,10 @@ void WallThings::Draw(RenderContext& rc) const
 		thing->Draw(rc);
 }
 
-WallThingOpPtr WallThings::UpdateForAddedVert(const Jig::EdgeMesh::Edge& edge)
+WallThingOpPtr WallThings::UpdateForAddedVert(const Jig::EdgeMesh::Edge& edge, int count)
 {
 	WallThingOpPtr op = std::make_unique<WallThingOp>(*this);
-	op->AddedVert(edge);
+	op->AddedVert(edge, count);
 	return op;
 }
 

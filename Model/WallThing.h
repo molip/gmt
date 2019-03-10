@@ -58,7 +58,7 @@ namespace GMT::Model
 		bool EdgeHasThing(const Jig::EdgeMesh::Edge& edge) const;
 		void Draw(RenderContext& rc) const;
 
-		WallThingOpPtr UpdateForAddedVert(const Jig::EdgeMesh::Edge& edge);
+		WallThingOpPtr UpdateForAddedVert(const Jig::EdgeMesh::Edge& edge, int count = 1);
 		WallThingOpPtr UpdateForDeletedVert(const std::vector<const Jig::EdgeMesh::Edge*>& edges);
 		WallThingOpPtr UpdateForMergedFace(const std::vector<const Jig::EdgeMesh::Edge*>& edges);
 		WallThingOpPtr UpdateForDeletedFace(const Jig::EdgeMesh::Face& face);

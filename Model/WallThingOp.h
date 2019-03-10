@@ -13,7 +13,7 @@ namespace GMT::Model
 	public:
 		WallThingOp(WallThings& wallThings) : m_things(wallThings.m_things) {}
 
-		void AddedVert(const Jig::EdgeMesh::Edge& edge);
+		void AddedVert(const Jig::EdgeMesh::Edge& edge, int count);
 		void DeletedVert(const std::vector<const Jig::EdgeMesh::Edge*>& edges);
 		void MergedFace(const std::vector<const Jig::EdgeMesh::Edge*>& edges);
 		void DeletedFace(const Jig::EdgeMesh::Face& face);
