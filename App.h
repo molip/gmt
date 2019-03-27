@@ -3,6 +3,7 @@
 #include "libraries/libKernel/Singleton.h"
 
 #include <memory>
+#include <vector>
 
 namespace Kernel
 {
@@ -35,7 +36,7 @@ namespace GMT
 	class App : public Kernel::Singleton<App>
 	{
 	public:
-		App();
+		App(const std::vector<std::wstring>& args);
 		~App();
 
 		static void SetMainWindow(Window* window);
@@ -61,6 +62,7 @@ namespace GMT
 		static bool PreClose() { return Get()->PreDiscardModel(); }
 
 	private:
+		void ResaveDocuments();
 		std::wstring DoFileDialog(bool save);
 		bool PreDiscardModel(); // Return true to discard.
 		void* GetMainWindowHandle() const;

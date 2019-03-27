@@ -13,6 +13,8 @@
 #include "libKernel/MessageBox.h"
 #include "libKernel/Util.h"
 
+#include <filesystem>
+
 using namespace GMT;
 
 SINGLETON(App)
@@ -24,7 +26,7 @@ namespace
 	auto AutosavePath = L"\\Autosave";
 }
 
-GMT::App::App()
+GMT::App::App(const std::vector<std::wstring>& args)
 {
 	m_rootPath = Kernel::FileSystem::GetUserDocumentsDir();
 	KERNEL_VERIFY(!m_rootPath.empty());
@@ -40,10 +42,22 @@ GMT::App::App()
 	m_selection = std::make_unique<Model::Selection>();
 	m_commandStack = std::make_unique<Model::CommandStack>(*m_model);
 
-	m_model->LoadFile(m_rootPath + L"\\_default.gmt");
+
+	if (std::find(args.begin(), args.end(), L"/resave") != args.end())
+		ResaveDocuments();
+	else
+		m_model->LoadFile(m_rootPath + L"\\_default.gmt");
 }
 
 GMT::App::~App() = default;
+
+void GMT::App::ResaveDocuments()
+{
+	for (auto& item : std::filesystem::recursive_directory_iterator(m_rootPath))
+		if (item.is_regular_file() && item.path().extension() == L".gmt")
+			if (m_model->LoadFile(item.path()))
+				m_model->SaveFile(item.path());
+}
 
 void GMT::App::SetMainWindow(Window* window) 
 {
