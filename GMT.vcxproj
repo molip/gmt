@@ -104,6 +104,7 @@
     <ClCompile Include="Model\Notification.cpp" />
     <ClCompile Include="Model\Object.cpp" />
     <ClCompile Include="Model\Selection.cpp" />
+    <ClCompile Include="Model\ImageResource.cpp" />
     <ClCompile Include="Model\VectorObject.cpp" />
     <ClCompile Include="Model\WallThing.cpp" />
     <ClCompile Include="Model\WallThingOp.cpp" />
@@ -141,6 +142,7 @@
     <ClInclude Include="Model\Notification.h" />
     <ClInclude Include="Model\Object.h" />
     <ClInclude Include="Model\Selection.h" />
+    <ClInclude Include="Model\ImageResource.h" />
     <ClInclude Include="Model\VectorObject.h" />
     <ClInclude Include="Model\WallThing.h" />
     <ClInclude Include="Model\WallThingOp.h" />

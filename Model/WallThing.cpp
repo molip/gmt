@@ -4,10 +4,12 @@
 #include "../RenderContext.h"
 #include "../Grid.h"
 
-#include <SFML/Graphics.hpp>
-
 using namespace GMT;
 using namespace GMT::Model;
+
+WallThing::WallThing()
+{
+}
 
 Jig::Vec2 WallThing::GetPoint() const
 {
@@ -20,6 +22,7 @@ void WallThing::Load(const Kernel::Serial::LoadNode& node)
 	node.LoadObjectRef("edge", m_position.edge);
 	node.LoadType("dist", m_position.dist);
 	node.LoadType("flipped", m_flipped);
+	node.LoadClass("image", m_image);
 }
 
 void WallThing::Save(Kernel::Serial::SaveNode& node) const
@@ -27,6 +30,7 @@ void WallThing::Save(Kernel::Serial::SaveNode& node) const
 	node.SaveObjectRef("edge", m_position.edge);
 	node.SaveType("dist", m_position.dist);
 	node.SaveType("flipped", m_flipped);
+	node.SaveClass("image", m_image);
 }
 
 
@@ -34,14 +38,13 @@ REGISTER_DYNAMIC(Door)
 
 Door::Door()
 {
-	m_texture = std::make_unique<sf::Texture>();
-	m_texture->loadFromFile("door.jpg");
+	SetImageID("door1");
 }
 
 void Door::Draw(RenderContext& rc) const
 {
 	const auto centre = rc.GetGrid().GetPoint(sf::Vector2f(GetPoint()));
-	auto offset = -Jig::Vec2f(m_texture->getSize()) * 0.5f;
+	auto offset = -Jig::Vec2f(m_image.GetSize()) * 0.5f;
 	if (!m_position.edge->twin)
 		offset.y *= 2;
 
@@ -51,7 +54,7 @@ void Door::Draw(RenderContext& rc) const
 	xf.translate(offset);
 
 	sf::RenderStates renderStates(xf);
-	rc.GetWindow().draw(sf::Sprite(*m_texture), renderStates);
+	m_image.Draw(rc, renderStates);
 }
 
 

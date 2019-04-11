@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ImageResource.h"
+
 #include "Jig/EdgeMesh.h"
 
 #include <vector>
@@ -16,6 +18,7 @@ namespace GMT
 
 namespace GMT::Model
 {
+	class ImageResource;
 	class WallThingOp;
 	using WallThingOpPtr = std::unique_ptr<WallThingOp>;
 
@@ -29,7 +32,7 @@ namespace GMT::Model
 			double dist{ 0.5 };
 		};
 
-		WallThing(const Jig::EdgeMesh::Edge* edge = nullptr) : m_position{ edge } {}
+		WallThing();
 
 		virtual void Draw(RenderContext& rc) const = 0;
 		virtual bool IsSurface() const { return true; }
@@ -42,12 +45,15 @@ namespace GMT::Model
 		bool CanFlip() const { return !IsSurface(); }
 		void ToggleFlipped() { m_flipped = !m_flipped; }
 
+		void SetImageID(const std::string& id) { m_image.SetID(id); }
+
 		void Load(const Kernel::Serial::LoadNode& node);
 		void Save(Kernel::Serial::SaveNode& node) const;
 
 	protected:
 		Position m_position;
 		bool m_flipped{};
+		ObjectImageResourceRef m_image;
 	};
 	using WallThingPtr = std::unique_ptr<WallThing>;
 
@@ -57,8 +63,6 @@ namespace GMT::Model
 		Door();
 		virtual void Draw(RenderContext& rc) const override;
 		virtual bool IsSurface() const { return false; }
-	private:
-		std::unique_ptr<sf::Texture> m_texture;
 	};
 
 	class WallThings

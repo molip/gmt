@@ -6,6 +6,7 @@
 #include "Model/Notification.h"
 #include "Model/Object.h"
 #include "Model/Selection.h"
+#include "Model/ImageResource.h"
 	  
 #include "libKernel/FileDialog.h"
 #include "libKernel/Filesystem.h"
@@ -42,6 +43,7 @@ GMT::App::App(const std::vector<std::wstring>& args)
 	m_selection = std::make_unique<Model::Selection>();
 	m_commandStack = std::make_unique<Model::CommandStack>(*m_model);
 
+	Model::ImageResources::Init(m_rootPath + L"\\\\Resources");
 
 	if (std::find(args.begin(), args.end(), L"/resave") != args.end())
 		ResaveDocuments();

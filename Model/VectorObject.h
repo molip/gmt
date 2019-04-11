@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Object.h"
+#include "ImageResource.h"
 #include "WallThing.h"
 
 #include "Jig/EdgeMesh.h"
@@ -47,6 +48,10 @@ namespace GMT::Model
 		const WallThings& GetWallThings() const { return m_wallThings; }
 		WallThings& GetWallThings() { return m_wallThings; }
 
+		void SetWallImageID(const std::string& id) { m_wallImage.SetID(id); }
+		void SetFloorImageID(const std::string& id) { m_floorImage.SetID(id); }
+		void SetPillarImageID(const std::string& id) { m_pillarImage.SetID(id); }
+
 	private:
 		VectorObject(const Jig::Polygon& poly);
 
@@ -61,7 +66,8 @@ namespace GMT::Model
 		mutable sf::VertexArray m_floors, m_innerWalls, m_outerWalls, m_pillars;
 
 		std::unique_ptr<Jig::EdgeMesh> m_edgeMesh;
-		std::unique_ptr<sf::Texture> m_wallTexture, m_floorTexture, m_pillarTexture;
+		ObjectImageResourceRef m_pillarImage;
+		ImageResourceRef m_wallImage, m_floorImage;
 
 		WallThings m_wallThings;
 	};

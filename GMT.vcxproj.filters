@@ -87,6 +87,9 @@
     <ClCompile Include="Model\Command\MoveWallThing.cpp">
       <Filter>Model\Command</Filter>
     </ClCompile>
+    <ClCompile Include="Model\ImageResource.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="View.h" />
@@ -170,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="Model\Command\MoveWallThing.h">
       <Filter>Model\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\ImageResource.h">
+      <Filter>Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

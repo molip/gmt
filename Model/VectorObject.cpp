@@ -46,21 +46,15 @@ std::unique_ptr<VectorObject> VectorObject::Create(std::vector<sf::Vector2f> poi
 	if (poly.IsSelfIntersecting())
 		return nullptr;
 
-	return std::unique_ptr<VectorObject>(new VectorObject(poly));
+	auto object = std::unique_ptr<VectorObject>(new VectorObject(poly));
+	return object;
 }
 
-VectorObject::VectorObject()
+VectorObject::VectorObject() : m_wallImage(ImageResource::Type::Wall), m_floorImage(ImageResource::Type::Floor)
 {
-	m_wallTexture = std::make_unique<sf::Texture>();
-	m_wallTexture->loadFromFile("wall.jpg");
-	m_wallTexture->setRepeated(true);
-
-	m_floorTexture = std::make_unique<sf::Texture>();
-	m_floorTexture->loadFromFile("floor.jpg");
-	m_floorTexture->setRepeated(true);
-
-	m_pillarTexture = std::make_unique<sf::Texture>();
-	m_pillarTexture->loadFromFile("pillar.png");
+	m_wallImage.SetID("wall1");
+	m_floorImage.SetID("floor1");
+	m_pillarImage.SetID("pillar1");
 }
 
 VectorObject::VectorObject(const Jig::Polygon& poly) : VectorObject()
@@ -87,12 +81,19 @@ void VectorObject::Save(Kernel::Serial::SaveNode & node) const
 {
 	node.SaveClassPtr("mesh", m_edgeMesh);
 	node.SaveClass("wall_things", m_wallThings);
+	node.SaveClass("wall_image", m_wallImage);
+	node.SaveClass("floor_image", m_floorImage);
+	node.SaveClass("pillar_image", m_pillarImage);
 }
 
 void VectorObject::Load(const Kernel::Serial::LoadNode & node)
 {
 	node.LoadClassPtr("mesh", m_edgeMesh);
 	node.LoadClass("wall_things", m_wallThings);
+	node.LoadClass("wall_image", m_wallImage);
+	node.LoadClass("floor_image", m_floorImage);
+	node.LoadClass("pillar_image", m_pillarImage);
+	
 	Update();
 }
 
@@ -100,16 +101,16 @@ void VectorObject::Draw(RenderContext& rc) const
 {
 	sf::RenderStates renderStates(rc.GetGrid().GetTransform());
 
-	renderStates.texture = m_floorTexture.get();
+	renderStates.texture = m_floorImage.GetTexture();
 	rc.GetWindow().draw(m_floors, renderStates);
 
-	renderStates.texture = m_wallTexture.get();
+	renderStates.texture = m_wallImage.GetTexture();
 	rc.GetWindow().draw(m_innerWalls, renderStates);
 
-	renderStates.texture = m_wallTexture.get();
+	renderStates.texture = m_wallImage.GetTexture();
 	rc.GetWindow().draw(m_outerWalls, renderStates);
 
-	renderStates.texture = m_pillarTexture.get();
+	renderStates.texture = m_pillarImage.GetTexture();
 	rc.GetWindow().draw(m_pillars, renderStates);
 
 	renderStates.texture = nullptr;
@@ -134,7 +135,7 @@ void VectorObject::Update() const
 
 	m_floors = GetFloors();
 
-	WallMaker wallMaker(*m_edgeMesh, m_wallTexture->getSize(), m_pillarTexture->getSize());
+	WallMaker wallMaker(*m_edgeMesh, m_wallImage.GetSize(), m_pillarImage.GetSize());
 	m_innerWalls = wallMaker.GetInnerWalls();
 	m_outerWalls = wallMaker.GetOuterWalls();
 	m_pillars = wallMaker.GetPillars();
@@ -144,7 +145,7 @@ sf::VertexArray VectorObject::GetFloors() const
 {
 	sf::VertexArray floors(sf::Triangles);
 
-	const Jig::Vec2f texSize(m_floorTexture->getSize());
+	const Jig::Vec2f texSize(m_floorImage.GetSize());
 
 	if (texSize.IsZero())
 		return {};
