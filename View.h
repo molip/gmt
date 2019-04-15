@@ -19,7 +19,7 @@ namespace GMT
 		View();
 		virtual ~View();
 
-		void SetRect(const sf::IntRect& rect);
+		void Arrange();
 		const sf::IntRect& GetRect() const { return m_rect; }
 
 		void SetOrigin(const sf::Vector2i& origin);
@@ -42,7 +42,7 @@ namespace GMT
 	protected:
 		virtual sf::FloatRect GetLogRect() const;
 		virtual sf::FloatRect GetClipRect() const;
-		virtual void UpdateLayout(const sf::FloatRect logRect) {}
+		virtual void Arrange(const sf::IntRect& rect) {}
 		virtual void Draw(sf::RenderWindow& window) const {}
 
 		sf::IntRect m_rect; // Parent space.

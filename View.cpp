@@ -41,14 +41,9 @@ void View::BaseDraw(sf::RenderWindow& window) const
 		child->BaseDraw(window);
 }
 
-void View::SetRect(const sf::IntRect& rect)
+void View::Arrange(const sf::IntRect& rect)
 {
-	const bool sizeChanged = rect.width != m_rect.width || rect.height != m_rect.height;
-
 	m_rect = rect;
-
-	if (sizeChanged)
-		UpdateLayout(GetLogRect());
 }
 
 sf::FloatRect View::GetLogRect() const
