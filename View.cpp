@@ -18,22 +18,14 @@ sf::View View::GetSFView(sf::RenderWindow& window) const
 	
 	const float width = float(window.getSize().x);
 	const float height = float(window.getSize().y);
-	view.setViewport(sf::FloatRect((m_origin.x + clipRect.left) / width, (m_origin.y + clipRect.top) / height, clipRect.width / width, clipRect.height / height));
+	view.setViewport(sf::FloatRect(clipRect.left / width, clipRect.top / height, clipRect.width / width, clipRect.height / height));
 
 	return view;
 }
 
-void View::SetOrigin(const sf::Vector2i& origin)
+void View::BaseDraw(sf::RenderWindow& window, const sf::FloatRect& clip) const
 {
-	m_origin = origin;
-
-	for (auto& child : m_children)
-		child->SetOrigin({ origin.x + m_rect.left, origin.y + m_rect.top });
-}
-
-void View::BaseDraw(sf::RenderWindow& window) const
-{
-	window.setView(GetSFView(window));
+	window.setView(GetSFView(window)); // TODO: intersect parent.
 
 	Draw(window);
 
@@ -56,15 +48,13 @@ sf::FloatRect View::GetClipRect() const
 	return sf::FloatRect((float)m_rect.left, (float)m_rect.top, (float)m_rect.width, (float)m_rect.height);
 }
 
-View* View::HitTest(const sf::Vector2i& parentPoint) 
+View* View::HitTest(const sf::Vector2i& worldPoint) 
 {
-	if (!m_rect.contains(parentPoint))
+	if (!m_rect.contains(worldPoint))
 		return nullptr;
 
-	const sf::Vector2i localPoint = parentPoint - sf::Vector2i(m_rect.left, m_rect.top);
-
 	for (auto& child : m_children)
-		if (View* subView = child->HitTest(localPoint))
+		if (View* subView = child->HitTest(worldPoint))
 			return subView;
 
 	return this;
@@ -72,7 +62,7 @@ View* View::HitTest(const sf::Vector2i& parentPoint)
 
 sf::Vector2i View::WorldToLocal(const sf::Vector2i& point) const
 {
-	return { point.x - m_origin.x, point.y - m_origin.y };
+	return { point.x - m_rect.left, point.y - m_rect.top };
 }
 
 sf::Vector2f View::DevToLog(const sf::Vector2i& point) const

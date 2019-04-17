@@ -42,10 +42,7 @@ void Window::Draw()
 	clear();
 	
 	for (auto& view : m_views)
-	{
-		view->SetOrigin({});
-		view->BaseDraw(*this);
-	}
+		view->BaseDraw(*this, {});
 
 	display();
 }
