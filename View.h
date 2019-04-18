@@ -19,20 +19,23 @@ namespace GMT
 		View();
 		virtual ~View();
 
-		//void Arrange();
+		View& AddChild(std::unique_ptr<View> child);
+
+		void Arrange() { Arrange(m_rect); }
 		virtual void Arrange(const sf::IntRect& rect);
+		virtual sf::Vector2i GetIdealSize(const sf::Vector2i& available) const { return available; }
+
+		View* GetParent() { return m_parent; }
 		const sf::IntRect& GetRect() const { return m_rect; }
 
-		void SetParent(View* parent) { m_parent = parent; }
-
-		void BaseDraw(sf::RenderWindow& window, const sf::FloatRect& clip) const;
-		sf::View GetSFView(sf::RenderWindow& window) const;
+		void BaseDraw(sf::RenderWindow& window, const sf::IntRect& parentClip) const;
 
 		View* HitTest(const sf::Vector2i& worldPoint);
 
 		virtual void OnMouseMoved(const sf::Vector2i& point) {}
 		virtual void OnMouseDown(sf::Mouse::Button button, const sf::Vector2i& point) {}
 		virtual void OnMouseUp(sf::Mouse::Button button, const sf::Vector2i& point) {}
+		virtual bool OnMouseWheel(float delta) { return false; }
 
 		virtual void OnKeyPressed(const sf::Event::KeyEvent event) {}
 
@@ -40,8 +43,8 @@ namespace GMT
 		sf::Vector2f DevToLog(const sf::Vector2i& point) const;
 
 	protected:
-		virtual sf::FloatRect GetLogRect() const;
-		virtual sf::FloatRect GetClipRect() const;
+		sf::FloatRect GetLogRect() const;
+		virtual float GetDevToLogScale() const { return 1; }
 		virtual void Draw(sf::RenderWindow& window) const {}
 
 		sf::IntRect m_rect; // World space.

@@ -41,8 +41,10 @@ void Window::Draw()
 {
 	clear();
 	
+	sf::IntRect rect({ 0, 0 }, { int(this->getSize().x), int(this->getSize().y) });
+
 	for (auto& view : m_views)
-		view->BaseDraw(*this, {});
+		view->BaseDraw(*this, rect);
 
 	display();
 }
@@ -76,6 +78,9 @@ void Window::PumpEvent(const sf::Event& event)
 	case sf::Event::MouseButtonReleased:
 		OnMouseUp(event.mouseButton);
 		break;
+	case sf::Event::MouseWheelScrolled:
+		OnMouseScroll(event.mouseWheelScroll);
+		break;
 	case sf::Event::KeyPressed:
 		m_mainView->OnKeyPressed(event.key);
 		break;
@@ -102,3 +107,12 @@ void Window::OnMouseUp(const sf::Event::MouseButtonEvent& event)
 	if (View* hit = HitTest(point))
 		hit->OnMouseUp(event.button, hit->WorldToLocal(point));
 }
+
+void Window::OnMouseScroll(const sf::Event::MouseWheelScrollEvent& event)
+{
+	sf::Vector2i point{ event.x, event.y };
+	for (View* hit = HitTest(point); hit; hit = hit->GetParent())
+		if (hit->OnMouseWheel(event.delta))
+			break;
+}
+

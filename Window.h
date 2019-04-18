@@ -30,6 +30,7 @@ namespace GMT
 		void OnMouseMoved(const sf::Event::MouseMoveEvent& event);
 		void OnMouseDown(const sf::Event::MouseButtonEvent& event);
 		void OnMouseUp(const sf::Event::MouseButtonEvent& event);
+		void OnMouseScroll(const sf::Event::MouseWheelScrollEvent& event);
 
 		View* HitTest(const sf::Vector2i& point);
 

@@ -72,33 +72,26 @@ void MainView::Draw(sf::RenderWindow& window) const
 
 float MainView::GetDevToLogScale() const
 {
-	return m_rect.width / (float)LogWidth;
+	return LogWidth / (float)m_rect.width;
 }
 
-sf::FloatRect MainView::GetLogRect() const
+void MainView::Arrange(const sf::IntRect& rect)
 {
-	return sf::FloatRect(0, 0, (float)LogWidth, (float)LogHeight);
-}
-
-sf::FloatRect MainView::GetClipRect() const
-{
-	sf::FloatRect clipRect = View::GetClipRect();
+	m_rect = rect;
 
 	sf::Vector2u devSize(m_rect.width, m_rect.height);
 	if (devSize.x <= 0 || devSize.y <= 0)
-		return sf::FloatRect();
+		return;
 
-	sf::FloatRect logRect = GetLogRect();
+	sf::FloatRect logRect({}, { (float)LogWidth, (float)LogHeight });
 
 	const float devAspect = devSize.x / float(devSize.y);
-	const float logAspect = logRect.width / float(logRect.height);
+	const float targetAspect = logRect.width / float(logRect.height);
 
-	if (devAspect > logAspect)
-		clipRect.width = clipRect.height * logAspect;
+	if (devAspect > targetAspect)
+		m_rect.width = int(m_rect.height * targetAspect);
 	else
-		clipRect.height = clipRect.width / logAspect;
-
-	return clipRect;
+		m_rect.height = int(m_rect.width / targetAspect);
 }
 
 void MainView::OnMouseMoved(const sf::Vector2i& point)
